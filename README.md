@@ -170,16 +170,16 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
 ```
 $ kubectl get pods
-NAME                              READY     STATUS    RESTARTS   
-istio-egress-3850639395-30d1v     1/1       Running   0       
-istio-ingress-4068702052-2st6r    1/1       Running   0       
-istio-manager-251184572-x9dd4     2/2       Running   0       
-istio-mixer-2499357295-kn4vq      1/1       Running   0       
+NAME                                            READY     STATUS    RESTARTS
+istio-egress-3850639395-30d1v                   1/1       Running   0       
+istio-ingress-4068702052-2st6r                  1/1       Running   0       
+istio-manager-251184572-x9dd4                   2/2       Running   0       
+istio-mixer-2499357295-kn4vq                    1/1       Running   0       
 microservice-schedule-sample-1128108920-bmfzp   2/2       Running   0          
 microservice-session-sample-1072599709-3bx9d    2/2       Running   0          
 microservice-speaker-sample-1948947026-f22n3    2/2       Running   0          
 microservice-vote-sample-3285487307-v8518       2/2       Running   0          
-microservice-webapp-sample-3174273294-4b877     2/2       Running   0          
+microservice-webapp-sample-3174273294-4b877     2/2       Running   0     
 ```
 # 4. Access your Application
 
@@ -191,12 +191,12 @@ Kubectl create -f manifests/ingress.yaml
 
 To access your application, you can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
-184.xxx.yyy.zzz:30XYZ
+$ echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+IP:NodePort #e.g. 184.172.247.2:30344
 ```
 
 Point your browser to:  
-`http://184.xxx.yyy.zzz:30XYZ` Replace with your own IP and NodePort.
+`http://<IP:NodePort>` Replace with your own IP and NodePort.
 
 
 
