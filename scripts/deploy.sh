@@ -14,9 +14,12 @@ if [ $? -ne 0 ]; then
 fi
 eval "$exp"
 
-echo "build and upload images"
-kubectl delete -f manifests/
-bash scripts/get_code_linux.sh
+echo "changing target images for all the yaml files"
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-vote.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-webapp.yaml
 
 echo "install Istio"
 curl -L https://git.io/getIstio | sh -
