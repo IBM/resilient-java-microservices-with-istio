@@ -16,7 +16,7 @@ eval "$exp"
 
 echo "build and upload images"
 kubectl delete -f manifests/
-bash get_code_linux.sh
+bash scripts/get_code_linux.sh
 
 echo "install Istio"
 curl -L https://git.io/getIstio | sh -
