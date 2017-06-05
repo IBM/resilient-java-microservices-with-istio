@@ -151,11 +151,11 @@ docker push registry.ng.bluemix.net/<namespace>/microservice-session
 # 3. Inject Istio Envoys on Java MicroProfile Application
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```bash
-kubectl apply -f <(istioctl kube-inject -f deploy-schedule.yaml)
-kubectl apply -f <(istioctl kube-inject -f deploy-session.yaml)
-kubectl apply -f <(istioctl kube-inject -f deploy-speaker.yaml)
-kubectl apply -f <(istioctl kube-inject -f deploy-vote.yaml)
-kubectl apply -f <(istioctl kube-inject -f deploy-webapp.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 ```
 
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
@@ -177,7 +177,7 @@ microservice-webapp-sample-3174273294-4b877     2/2       Running   0
 we want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
 
 ```bash
-Kubectl create -f ingress.yaml
+Kubectl create -f manifests/ingress.yaml
 ```
 
 To access your application, you can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
@@ -189,10 +189,11 @@ echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(
 Point your browser to:  
 `http://184.xxx.yyy.zzz:30XYZ` Replace with your own IP and NodePort.
 
-  ```
+```
+
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
-* Install the required Istio Addons on your cluster: [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com)
+* First, go back to your Isito's main directory. Install the required Istio Addons on your cluster: [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com)
   ```bash
   $ kubectl apply -f install/kubernetes/addons/prometheus.yaml
   $ kubectl apply -f install/kubernetes/addons/grafana.yaml
