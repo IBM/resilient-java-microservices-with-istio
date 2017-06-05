@@ -37,4 +37,10 @@ docker build -t registry.ng.bluemix.net/$namespace/microservice-vote .
 docker push registry.ng.bluemix.net/$namespace/microservice-vote
 cd ..
 
+sed -i s#"<namespace>"#$namespace# manifests/deploy-schedule.yaml
+sed -i s#"<namespace>"#$namespace# manifests/deploy-session.yaml
+sed -i s#"<namespace>"#$namespace# manifests/deploy-speaker.yaml
+sed -i s#"<namespace>"#$namespace# manifests/deploy-vote.yaml
+sed -i s#"<namespace>"#$namespace# manifests/deploy-webapp.yaml
+
 echo "All your images are upload to your $namespace namespace."

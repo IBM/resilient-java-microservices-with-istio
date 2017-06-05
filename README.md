@@ -23,7 +23,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 1. [Installing Istio](#1-installing-istio-in-your-cluster)
 2. [Get and build the application code](#2-get-and-build-the-application-code)
-3. [Inject Istio on Java MicroProfile App](#3-inject-istio-envoys-on-java-microProfile-application)
+3. [Inject Istio on Java MicroProfile App](#3-inject-istio-envoys-on-java-microprofile-application)
 4. [Access your Application](#4-access-your-application)
 5. [Collecting Metrics and Logs](#5-collecting-metrics-and-logs)
 6. [Request Tracing](#6-request-tracing)
@@ -78,7 +78,12 @@ istio-mixer-2499357295-kn4vq      1/1       Running   0
 # 2. Get and build the application code
 First, clone and get in our repository `git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-ISTIO.git && cd Java-MicroProfile-Microservices-on-ISTIO` to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
-> **Note:** For the following steps, you can get the code and build the package by running `bash scripts/get_code.sh`.
+> **Note:** For the following steps, you can get the code and build the package by running 
+> ```bash
+> bash scripts/get_code.linux.sh #For Linux users
+> bash scripts/get_code.osx.sh #For Mac users
+> ```
+>Then, you can move on to [Step 3](#3-inject-istio-envoys-on-java-microprofile-application).
 
 * `git clone` the following projects:
    * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
@@ -149,6 +154,10 @@ docker push registry.ng.bluemix.net/<namespace>/microservice-session
 ```
 
 # 3. Inject Istio Envoys on Java MicroProfile Application
+
+Before you proceed to the following steps, change the `<namespace>` in your yaml files to your own namespace.
+>Note: If you ran the get code script, your namespace is already changed.
+
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```bash
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
@@ -161,11 +170,11 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
 ```
 $ kubectl get pods
-NAME                              				READY     STATUS    RESTARTS   
-istio-egress-3850639395-30d1v     				1/1       Running   0       
-istio-ingress-4068702052-2st6r   				1/1       Running   0       
-istio-manager-251184572-x9dd4     				2/2       Running   0       
-istio-mixer-2499357295-kn4vq      				1/1       Running   0       
+NAME                              READY     STATUS    RESTARTS   
+istio-egress-3850639395-30d1v     1/1       Running   0       
+istio-ingress-4068702052-2st6r    1/1       Running   0       
+istio-manager-251184572-x9dd4     2/2       Running   0       
+istio-mixer-2499357295-kn4vq      1/1       Running   0       
 microservice-schedule-sample-1128108920-bmfzp   2/2       Running   0          
 microservice-session-sample-1072599709-3bx9d    2/2       Running   0          
 microservice-speaker-sample-1948947026-f22n3    2/2       Running   0          
