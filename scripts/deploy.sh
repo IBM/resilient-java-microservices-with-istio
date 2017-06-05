@@ -15,6 +15,7 @@ fi
 eval "$exp"
 
 echo "changing target images for all the yaml files"
+kubectl delete -f manifests/
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
@@ -25,7 +26,6 @@ echo "install Istio"
 curl -L https://git.io/getIstio | sh -
 cd $(ls | grep istio)
 export PATH="$PATH:$(pwd)/bin"
-echo "default" | ./samples/apps/bookinfo/cleanup.sh
 kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
 kubectl apply -f install/kubernetes/istio.yaml
 
