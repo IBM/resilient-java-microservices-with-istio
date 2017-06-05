@@ -189,7 +189,7 @@ echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(
 Point your browser to:  
 `http://184.xxx.yyy.zzz:30XYZ` Replace with your own IP and NodePort.
 
-```
+
 
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
