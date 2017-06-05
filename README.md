@@ -85,7 +85,7 @@ First, clone and get in our repository `git clone https://github.com/IBM/Java-Mi
 > ```
 >Then, you can move on to [Step 3](#3-inject-istio-envoys-on-java-microprofile-application).
 
-* `git clone` the following projects:
+  `git clone` the following projects:
    * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
    ```bash
       git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git

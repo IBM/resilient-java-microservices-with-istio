@@ -5,8 +5,8 @@ function mvn_clean() {
   cd ..
 }
 
+bx plugin install container-registry -r Bluemix
 bx cr login
-
 export namespace=$(echo $(bx cr namespaces) | awk '{ print $4;exit }')
 
 git clone https://github.com/WASdev/sample.microservicebuilder.web-app
@@ -43,4 +43,4 @@ sed -i s#"<namespace>"#$namespace# manifests/deploy-speaker.yaml
 sed -i s#"<namespace>"#$namespace# manifests/deploy-vote.yaml
 sed -i s#"<namespace>"#$namespace# manifests/deploy-webapp.yaml
 
-echo "All your images are upload to your $namespace namespace."
+echo "All your images are uploaded to your $namespace namespace."
