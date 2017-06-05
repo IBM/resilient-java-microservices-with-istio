@@ -5,13 +5,13 @@ wget --quiet --output-document=/tmp/Bluemix_CLI_amd64.tar.gz  http://public.dhe.
 tar -xf /tmp/Bluemix_CLI_amd64.tar.gz --directory=/tmp
 
 # Create bx alias
-echo "#!/bin/sh" >/tmp/Bluemix_CLI/bin/bx
+echo "#!/bin/bash" >/tmp/Bluemix_CLI/bin/bx
 echo "/tmp/Bluemix_CLI/bin/bluemix \"\$@\" " >>/tmp/Bluemix_CLI/bin/bx
 chmod +x /tmp/Bluemix_CLI/bin/*
 
 export PATH="/tmp/Bluemix_CLI/bin:$PATH"
 
-# Install Armada CS plugin
+# Install Bluemix CS plugin
 echo "Install the Bluemix container-service plugin"
 bx plugin install container-service -r Bluemix
 
@@ -24,9 +24,3 @@ if [ -n "$DEBUG" ]; then
   bx plugin list
 fi
 
-if [ -z $CF_ORG ]; then
-  CF_ORG="$BLUEMIX_ORG"
-fi
-if [ -z $CF_SPACE ]; then
-  CF_SPACE="$BLUEMIX_SPACE"
-fi

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ -z $CF_ORG ]; then
   CF_ORG="$BLUEMIX_ORG"
@@ -8,16 +8,10 @@ if [ -z $CF_SPACE ]; then
 fi
 
 
-if [ -z "$BLUEMIX_USER" ] || [ -z "$BLUEMIX_PASSWORD" ] || [ -z "$BLUEMIX_ACCOUNT" ]; then
-    if [ -z "$API_KEY"]
-    then
-        echo "Define BLUEMIX_USER, BLUEMIX PASSWORD and BLUEMIX_ACCOUNT environment variables or just use the API_KEY environment variable."
-        exit 1
-    else
-        echo "Logging in using API_KEY environment variable"
-    fi
+if ([ -z "$BLUEMIX_USER" ] || [ -z "$BLUEMIX_PASSWORD" ] || [ -z "$BLUEMIX_ACCOUNT" ]) && ([ -z "$API_KEY"]); then
+  echo "Define all required environment variables and re-run the stage."
+  exit 1
 fi
-echo "Deploy pods"
 
 echo "bx login -a $CF_TARGET_URL"
 
@@ -27,7 +21,11 @@ else
   bx login -a "$CF_TARGET_URL" --apikey "$API_KEY" -o "$CF_ORG" -s "$CF_SPACE"
 fi
 
-# Init container clusters
+if [ $? -ne 0 ]; then
+  echo "Failed to authenticate to Bluemix"
+  exit 1
+fi
+
 echo "bx cs init"
 bx cs init
 if [ $? -ne 0 ]; then
