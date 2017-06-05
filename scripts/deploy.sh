@@ -15,6 +15,7 @@ fi
 eval "$exp"
 
 echo "build and upload images"
+kubectl delete -f manifests/
 bash get_code_linux.sh
 
 echo "install Istio"
@@ -44,7 +45,7 @@ echo "Finished Istio Control Plane setup."
 
 echo "Creating Java MicroProfile with Injected Envoys..."
 cd ..
-Kubectl create -f manifests/ingress.yaml
+kubectl create -f manifests/ingress.yaml
 kubectl create -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl create -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
 kubectl create -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
