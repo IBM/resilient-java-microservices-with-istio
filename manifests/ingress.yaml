@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+spec:
+  backend:
+    serviceName: webapp-service
+    servicePort: 9080
+  rules:
+  - http:
+      paths:
+      - path: /.*
+        backend:
+          serviceName: webapp-service
+          servicePort: 9080
+      - path: /vote
+        backend:
+          serviceName: vote-service
+          servicePort: 9080
+      - path: /schedule
+        backend:
+          serviceName: schedule-service
+          servicePort: 9080
+      - path: /speaker
+        backend:
+          serviceName: speaker-service
+          servicePort: 9080
+      - path: /sessions
+        backend:
+          serviceName: session-service
+          servicePort: 9080
+      - path: /vote/.*
+        backend:
+          serviceName: vote-service
+          servicePort: 9080
+      - path: /schedule/.*
+        backend:
+          serviceName: schedule-service
+          servicePort: 9080
+      - path: /speaker/.*
+        backend:
+          serviceName: speaker-service
+          servicePort: 9080
+      - path: /sessions/.*
+        backend:
+          serviceName: session-service
+          servicePort: 9080

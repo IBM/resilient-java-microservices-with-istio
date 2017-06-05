@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: microservice-session-sample
+  labels:
+    app: microprofile-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: session-deployment
+    spec:
+      containers:
+      - name: microservice-session
+        #change the image name
+        image: registry.ng.bluemix.net/<namespace>/microservice-session
+        ports:
+          - containerPort: 9080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-service
+  labels:
+    app: microprofile-app
+  namespace: default
+spec:
+  ports:
+    - port: 9080
+      targetPort: 9080
+      name: http
+  selector:
+    name: session-deployment
