@@ -7,7 +7,7 @@ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github"
 sudo mv cf /usr/local/bin
 sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercontent.com/cloudfoundry/cli/master/ci/installers/completion/cf
 cf --version
-curl -L public.dhe.ibm.com/cloud/bluemix/cli/bluemix-cli/Bluemix_CLI_0.5.1_amd64.tar.gz > Bluemix_CLI.tar.gz
+curl -L public.dhe.ibm.com/cloud/bluemix/cli/bluemix-cli/Bluemix_CLI_0.5.4_amd64.tar.gz > Bluemix_CLI.tar.gz
 tar -xvf Bluemix_CLI.tar.gz
 sudo ./Bluemix_CLI/install_bluemix_cli
 }
@@ -83,7 +83,7 @@ echo "MicroProfile done."
 function health_check() {
 
 export GATEWAY_URL=$(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
-HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL/productpage)
+HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL)
 if [ $HEALTH -eq 200 ]
 then
   echo "Everything looks good."
