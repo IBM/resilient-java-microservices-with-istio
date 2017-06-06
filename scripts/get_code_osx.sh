@@ -5,7 +5,6 @@ function mvn_clean() {
   cd ..
 }
 
-bx plugin install container-registry -r Bluemix
 bx cr login
 export namespace=$(echo $(bx cr namespaces) | awk '{ print $4;exit }')
 

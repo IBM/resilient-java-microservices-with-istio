@@ -15,7 +15,7 @@ fi
 eval "$exp"
 
 echo "changing target images for all the yaml files"
-kubectl delete -f manifests/
+kubectl delete --ignore-not-found=true -f manifests/
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml

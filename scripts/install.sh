@@ -27,7 +27,7 @@ bx cs workers $CLUSTER
 $(bx cs cluster-config $CLUSTER | grep export)
 
 #Delete previous deployment and change image names.
-kubectl delete -f manifests/
+kubectl delete --ignore-not-found=true -f manifests/
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml

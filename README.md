@@ -73,10 +73,18 @@ istio-ingress-4068702052-2st6r    1/1       Running   0
 istio-manager-251184572-x9dd4     2/2       Running   0       
 istio-mixer-2499357295-kn4vq      1/1       Running   0       
 ```
-* _(Optional) For more options/addons such as installing Istio with [Auth feature](https://istio.io/docs/concepts/network-and-auth/auth.html) and [collecting telemetry data](https://istio.io/docs/tasks/metrics-logs.html), go [ here](https://istio.io/docs/tasks/installing-istio.html#prerequisites)._
+* _(Optional) For more options/addons such as installing Istio with [Auth feature](https://istio.io/docs/concepts/network-and-auth/auth.html) and [collecting telemetry data](https://istio.io/docs/tasks/metrics-logs.html), go [here](https://istio.io/docs/tasks/installing-istio.html#prerequisites)._
 
 # 2. Get and build the application code
 First, clone and get in our repository `git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-ISTIO.git && cd Java-MicroProfile-Microservices-on-ISTIO` to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
+
+Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
+
+```bash
+bx plugin install container-registry -r Bluemix
+bx cr namespaces #If there's a namespace in your account, then you don't need to create a new one.
+bx cr namespace-add <namespace> #replace <namespace> with any name.
+```
 
 > **Note:** For the following steps, you can get the code and build the package by running 
 > ```bash
