@@ -9,13 +9,12 @@ sudo curl -o /usr/share/bash-completion/completions/cf https://raw.githubusercon
 cf --version
 curl -L public.dhe.ibm.com/cloud/bluemix/cli/bluemix-cli/Bluemix_CLI_0.5.1_amd64.tar.gz > Bluemix_CLI.tar.gz
 tar -xvf Bluemix_CLI.tar.gz
-cd Bluemix_CLI
-sudo ./install_bluemix_cli
+sudo ./Bluemix_CLI/install_bluemix_cli
 }
 
 function bluemix_auth() {
 echo "Authenticating with Bluemix"
-echo "y" | bx login -a https://api.ng.bluemix.net --apikey $API_KEY
+echo "1" | bx login -a https://api.ng.bluemix.net -u $BLUEMIX_USER -p $BLUEMIX_PASS
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 bx plugin install container-service -r Bluemix
 echo "Installing kubectl"
@@ -23,77 +22,87 @@ chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 }
 
-function sleep_func() {
-#statements
-echo "sleeping for 3m"
-sleep 3m
+function cluster_setup() {
+bx cs workers $CLUSTER
+$(bx cs cluster-config $CLUSTER | grep export)
+
+#Delete previous deployment and change image names.
+kubectl delete -f manifests/
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-vote.yaml
+sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-webapp.yaml
+
+curl -L https://git.io/getIstio | sh -
+cd $(ls | grep istio)
+sudo mv bin/istioctl /usr/local/bin/
+
+kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
+kubectl apply -f install/kubernetes/istio.yaml
+
+PODS=$(kubectl get pods | grep istio | grep Pending)
+while [ ${#PODS} -ne 0 ]
+do
+    echo "Some Pods are Pending..."
+    PODS=$(kubectl get pods | grep istio | grep Pending)
+    sleep 5s
+done
+
+PODS=$(kubectl get pods | grep istio | grep ContainerCreating)
+while [ ${#PODS} -ne 0 ]
+do
+    echo "Some Pods are still creating Containers..."
+    PODS=$(kubectl get pods | grep istio | grep ContainerCreating)
+    sleep 5s
+done
 }
 
-function run_tests() {
-bx cs workers sample
-$(bx cs cluster-config sample | grep -v "Downloading" | grep -v "OK" | grep -v "The")
+function initial_setup() {
+echo "Creating Java MicroProfile with Injected Envoys..."
+cd ..
+kubectl create -f manifests/ingress.yaml
+kubectl create -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
+kubectl create -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
+kubectl create -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
+kubectl create -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
+kubectl create -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 
-echo "Creating Deployments"
-git clone https://github.com/IBM/java-microprofile-on-kubernetes.git
+PODS=$(kubectl get pods | grep Init)
+while [ ${#PODS} -ne 0 ]
+do
+    echo "Some Pods are Initializing..."
+    PODS=$(kubectl get pods | grep Init)
+    sleep 5s
+done
 
-echo "Removing deployments"
-kubectl delete svc,rc,deployments,pods -l app=microprofile-app
-
-echo "Installing Helm"
-install_helm
-
-echo "Deploying speaker"
-cd java-microprofile-on-kubernetes/manifests
-kubectl create -f deploy-speaker.yaml
-sleep_func
-
-echo "Deploying schedule"
-kubectl create -f deploy-schedule.yaml
-sleep_func
-
-echo "Deploying vote"
-kubectl create -f deploy-vote.yaml
-sleep_func
-
-echo "Deploying session"
-kubectl create -f deploy-session.yaml
-sleep_func
-
-echo "Deploying webapp"
-kubectl create -f deploy-webapp.yaml
-sleep_func
-echo "Deploying nginx"
-IP_ADDRESS=$(bx cs workers $(bx cs clusters | grep deployed | awk '{ print $1 }') | grep deployed | awk '{ print $2 }')
-sed -i "s/xx.xx.xx.xx/$IP_ADDRESS/g" deploy-nginx.yaml
-kubectl create -f deploy-nginx.yaml
-sleep_func
+echo "MicroProfile done."
 
 }
 
-function install_helm(){
-  echo "Download Helm"
-  curl  https://storage.googleapis.com/kubernetes-helm/helm-v2.2.3-linux-amd64.tar.gz > helm-v2.2.3-linux-amd64.tar.gz
-  tar -xf helm-v2.2.3-linux-amd64.tar.gz
-  chmod +x ./linux-amd64
-  sudo mv ./linux-amd64/helm /usr/local/bin/helm
+function health_check() {
 
-  # Install Tiller using Helm
-  echo "Install Tiller"
-  helm init
-
-  #Add the repository
-  helm repo add mb http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/wasdev/microservicebuilder/helm/
-
-  #Install Microservice Builder Fabric using Helm
-  helm install mb/fabric
+export GATEWAY_URL=$(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL/productpage)
+if [ $HEALTH -eq 200 ]
+then
+  echo "Everything looks good."
+  echo "Cleaning up."
+  kubectl delete -f manifests/
+  cd $(ls | grep istio)
+  kubectl delete -f install/kubernetes/istio.yaml
+  kubectl delete -f install/kubernetes/istio-rbac-alpha.yaml
+  echo "Deleted Istio in cluster"
+else
+  echo "Health check failed."
+  exit 1
+fi
 }
 
-function exit_tests() {
-  kubectl delete svc,rc,deployments,pods -l app=microprofile-app
-}
 
 
 install_bluemix_cli
 bluemix_auth
-run_tests
-exit_tests
+cluster_setup
+initial_setup
+health_check

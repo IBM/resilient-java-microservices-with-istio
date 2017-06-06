@@ -1,0 +1,8 @@
+language: bash
+script: true
+sudo: required
+before_install:
+- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && bash scripts/install.sh || bash scripts/install_pr.sh'
+group: stable
+dist: precise
+os: linux
