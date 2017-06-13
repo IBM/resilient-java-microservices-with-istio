@@ -91,6 +91,9 @@ istio-mixer-2499357295-kn4vq      1/1       Running   0
 * _(Optional) For more options/addons such as installing Istio with [Auth feature](https://istio.io/docs/concepts/network-and-auth/auth.html) and [collecting telemetry data](https://istio.io/docs/tasks/metrics-logs.html), go [here](https://istio.io/docs/tasks/installing-istio.html#prerequisites)._
 
 # 2. Get and build the application code
+
+Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) installed on your machine.
+
 First, clone and get in our repository `git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-ISTIO.git && cd Java-MicroProfile-Microservices-on-ISTIO` to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
 Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
@@ -103,8 +106,8 @@ bx cr namespace-add <namespace> #replace <namespace> with any name.
 
 > **Note:** For the following steps, you can get the code and build the package by running 
 > ```bash
-> bash scripts/get_code.linux.sh #For Linux users
-> bash scripts/get_code.osx.sh #For Mac users
+> bash scripts/get_code_linux.sh #For Linux users
+> bash scripts/get_code_osx.sh #For Mac users
 > ```
 >Then, you can move on to [Step 3](#3-inject-istio-envoys-on-java-microprofile-application).
 
@@ -183,11 +186,11 @@ Before you proceed to the following steps, change the `<namespace>` in your yaml
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```bash
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 ```
 
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
@@ -196,7 +199,7 @@ $ kubectl get pods
 NAME                                            READY     STATUS    RESTARTS
 istio-egress-3850639395-30d1v                   1/1       Running   0       
 istio-ingress-4068702052-2st6r                  1/1       Running   0       
-istio-manager-251184572-x9dd4                   2/2       Running   0       
+istio-pilot-251184572-x9dd4                     2/2       Running   0       
 istio-mixer-2499357295-kn4vq                    1/1       Running   0       
 microservice-schedule-sample-1128108920-bmfzp   2/2       Running   0          
 microservice-session-sample-1072599709-3bx9d    2/2       Running   0          
@@ -209,7 +212,7 @@ microservice-webapp-sample-3174273294-4b877     2/2       Running   0
 we want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
 
 ```bash
-Kubectl create -f manifests/ingress.yaml
+kubectl create -f manifests/ingress.yaml
 ```
 
 To access your application, you can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
@@ -221,14 +224,14 @@ IP:NodePort #e.g. 184.172.247.2:30344
 Point your browser to:  
 `http://<IP:NodePort>` Replace with your own IP and NodePort.
 
-
+Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
 
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
 * First, go back to your Isito's main directory. Install the required Istio Addons on your cluster: [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com)
   ```bash
-  $ kubectl apply -f install/kubernetes/addons/prometheus.yaml
-  $ kubectl apply -f install/kubernetes/addons/grafana.yaml
+  kubectl apply -f install/kubernetes/addons/prometheus.yaml
+  kubectl apply -f install/kubernetes/addons/grafana.yaml
   ```
 * Verify that your **Grafana** dashboard is ready. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Grafana service `kubectl get svc | grep grafana` or you can run the following command to output both:
   ```bash
@@ -239,9 +242,9 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
   Your dashboard should look like this:  
   ![Grafana-Dashboard](images/grafana.png)
 
-* To collect new telemetry data, you will use `istio mixer rule create`. For this sample, you will generate logs for Response Size for Reviews service. The configuration YAML file is provided within the BookInfo sample folder. Validate that your Reviews service has no service-specific rules already applied.
+* To collect new telemetry data, you will use `istio mixer rule create`. For this sample, you will generate logs for Response Size for vote service.
   ```bash
-  $ istioctl mixer rule get reviews.default.svc.cluster.local reviews.default.svc.cluster.local
+  $ istioctl mixer rule get vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local
   Error: the server could not find the requested resource
   ```
 * Create a configuration YAML file and name it as `new_rule.yaml`:
@@ -259,7 +262,6 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
             source: source.labels["app"] | "unknown"
             target: target.service | "unknown"
             service: target.labels["app"] | "unknown"
-            version: target.labels["version"] | "unknown"
             method: request.path | "unknown"
             response_code: response.code | 200
     - adapter: default
@@ -293,7 +295,7 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
   ```
 * Create the configuration on Istio Mixer.
   ```bash
-  istioctl mixer rule create reviews.default.svc.cluster.local reviews.default.svc.cluster.local -f new_rule.yaml
+  istioctl mixer rule create vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local -f new_rule.yaml
   ```
 * Send traffic to that service by refreshing your browser to `http://184.xxx.yyy.zzz:30XYZ/productpage` multiple times. You can also do `curl` on your terminal to that URL in a while loop.
 
