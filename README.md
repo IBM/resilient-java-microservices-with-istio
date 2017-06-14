@@ -237,7 +237,7 @@ spec:
     weight: 50
 ```
 
-This route-rule will let each version recieve half of the traffic. You can change the **weight** to split more traffic on a particular version. Just remember all the weights must added up to 100.
+This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Just remember all the weights must added up to 100.
 
 Now let's apply this rule to your Istio Mixer.
 
@@ -246,7 +246,7 @@ istioctl create -f manifests/route-rule-vote.yaml
 istioctl get route-rules -o yaml #You can view all your route-rules by executing this command
 ```
 
-Now each version of your vote microservice should recieve half of the traffic. Let's test it out by accessing your application.
+Now each version of your vote microservice should receive half of the traffic. Let's test it out by accessing your application.
 
 To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
 
@@ -264,6 +264,8 @@ Point your browser to:
 `http://<IP:NodePort>` Replace with your own IP and NodePort.
 
 Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
+
+> Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition for creating the new databases.
 
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
