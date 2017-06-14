@@ -1,15 +1,18 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: microservice-vote-sample
+  name: microservice-vote-sample-v1
   labels:
     app: microprofile-app
+    version: v1
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         name: vote-deployment
+        app: vote-deployment
+        version: v1
     spec:
       containers:
       - name: microservice-vote
@@ -17,6 +20,48 @@ spec:
         image: registry.ng.bluemix.net/<namespace>/microservice-vote
         ports:
           - containerPort: 9080
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: microservice-vote-sample-v2
+  labels:
+    app: microprofile-app
+    version: v2
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: vote-deployment
+        app: vote-deployment
+        version: v2
+    spec:
+      containers:
+      - name: microservice-vote
+        #change this image name if you build your images on Linux
+        image: docker.io/tomcli/microservice-vote-cloudant
+        imagePullPolicy: Always
+        env:
+        - name: dbUsername
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbUsername
+        - name: dbPassword
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbPassword 
+        - name: dbHost
+          value: $CLOUDANT_SERVICE_SERVICE_HOST
+        - name: dbPort
+          value: $CLOUDANT_SERVICE_SERVICE_PORT
+        command: ["/bin/sh","-c"]
+        args: ["if [ ! -z $dbPassword ]; then export dbUrl=http://$CLOUDANT_SERVICE_SERVICE_HOST:$CLOUDANT_SERVICE_SERVICE_PORT; exec /opt/ibm/wlp/bin/server run defaultServer; fi;"]
+        ports:
+          - containerPort: 9080
+
 ---
 apiVersion: v1
 kind: Service

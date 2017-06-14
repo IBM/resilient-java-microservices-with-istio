@@ -1,0 +1,107 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cloudant-secret-generator-deploy
+  labels:
+    app: microprofile-app
+spec:
+  template:
+    metadata:
+      name: cloudant-secret-generator-deploy
+    spec:
+      containers:
+      - name: cloudant-secret-generator-deploy
+        image: ibmcom/kubernetes:v1.5.2
+        command: ["/bin/sh","-c"]
+        args: ["/kubectl get secret cloudant-secret || /kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --from-literal=dbPassword=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;`"]
+        resources:
+          limits:
+            cpu: 100m
+      restartPolicy: Never
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cloudant-pv
+  labels:
+    app: microprofile-app
+spec:
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/cloudant"
+  persistentVolumeReclaimPolicy: Recycle
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cloudant-pv-claim
+  labels:
+    app: microprofile-app
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudant-service
+  namespace: default
+  labels:
+    app: microprofile-app
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      nodePort: 31111
+      targetPort: 80
+      name: http
+  selector:
+    name: cloudant-deployment
+--- 
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cloudant-db
+  labels:
+    app: microprofile-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: cloudant-deployment
+    spec:
+      containers:
+      - name: cloudant-db
+        image: ibmcom/cloudant-developer:1.0.1
+        imagePullPolicy: Always
+        env:
+        - name: dbUsername
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbUsername
+        - name: dbPassword
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbPassword
+        command: ["/bin/sh","-c"]
+        args: ["if [ ! -z $dbPassword ]; then sed -i 's/^admin.*/admin = '$dbPassword'/g' /opt/cloudant/etc/local.ini && sed -i 's/^cloudant.*/cloudant = '$dbPassword'/g' /opt/cloudant/etc/local.ini && if [ ! -a /srv/cloudant ]; then sed -i 's/172.17.0.2/127.0.0.1/g' /etc/haproxy/haproxy.cfg && cast license --silent && cast database init -v -y -p $dbPassword ; fi; exec /usr/sbin/init; fi;"]
+        securityContext:
+          privileged: true
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: cloudant-pv
+          mountPath: /srv
+      volumes:
+        - name: cloudant-pv
+          persistentVolumeClaim:
+            claimName: cloudant-pv-claim
