@@ -39,7 +39,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 1. [Installing Istio](#1-installing-istio-in-your-cluster)
 2. [Get and build the application code](#2-get-and-build-the-application-code)
 3. [Inject Istio on Java MicroProfile App](#3-inject-istio-envoys-on-java-microprofile-application)
-4. [Access your Application](#4-access-your-application)
+4. [Split Your Traffic and Access your Application](#4-split-your-traffic-and-access-your-application)
 5. [Collecting Metrics and Logs](#5-collecting-metrics-and-logs)
 6. [Request Tracing](#6-request-tracing)
 
@@ -50,37 +50,37 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
   1. Download the latest Istio release for your OS: [Istio releases](https://github.com/istio/istio/releases)  
   2. Extract and go to the root directory.
   3. Copy the `istioctl` bin to your local bin  
-  ```bash
+  ```shell
   $ cp bin/istioctl /usr/local/bin
   ## example for macOS
   ```
 
 ## 1.2 Grant Permissions  
   1. Run the following command to check if your cluster has RBAC  
-  ```bash
+  ```shell
   $ kubectl api-versions | grep rbac
   ```  
   2. Grant permissions based on the version of your RBAC  
     * If you have an **alpha** version, run:
 
-      ```bash
+      ```shell
       $ kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
       ```
 
     * If you have a **beta** version, run:
 
-      ```bash
+      ```shell
       $ kubectl apply -f install/kubernetes/istio-rbac-beta.yaml
       ```
 
     * If **your cluster has no RBAC** enabled, proceed to installing the **Control Plane**.
 
 ## 1.3 Install the [Istio Control Plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) in your cluster  
-```bash
+```shell
 kubectl apply -f install/kubernetes/istio.yaml
 ```
 You should now have the Istio Control Plane running in Pods of your Cluster.
-```bash
+```shell
 $ kubectl get pods
 NAME                              READY     STATUS    RESTARTS
 istio-egress-3850639395-30d1v     1/1       Running   0       
@@ -94,18 +94,23 @@ istio-mixer-2499357295-kn4vq      1/1       Running   0
 
 Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) installed on your machine.
 
-First, clone and get in our repository `git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-ISTIO.git && cd Java-MicroProfile-Microservices-on-ISTIO` to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
+First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
+
+```shell
+git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio.git 
+cd Java-MicroProfile-Microservices-on-Istio
+```
 
 Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
 
-```bash
+```shell
 bx plugin install container-registry -r Bluemix
 bx cr namespaces #If there's a namespace in your account, then you don't need to create a new one.
 bx cr namespace-add <namespace> #replace <namespace> with any name.
 ```
 
 > **Note:** For the following steps, you can get the code and build the package by running 
-> ```bash
+> ```shell
 > bash scripts/get_code_linux.sh #For Linux users
 > bash scripts/get_code_osx.sh #For Mac users
 > ```
@@ -113,23 +118,23 @@ bx cr namespace-add <namespace> #replace <namespace> with any name.
 
   `git clone` the following projects:
    * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
-   ```bash
+   ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git
   ```
    * [Schedule](https://github.com/WASdev/sample.microservicebuilder.schedule)
-   ```bash
+   ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.schedule.git
   ```
    * [Speaker](https://github.com/WASdev/sample.microservicebuilder.speaker)
-   ```bash
+   ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.speaker.git
   ```
    * [Session](https://github.com/WASdev/sample.microservicebuilder.session)
-   ```bash
+   ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.session.git
   ```
-   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote)
-   ```bash
+   * [Vote Version 1](https://github.com/WASdev/sample.microservicebuilder.vote) 
+   ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
       cd sample.microservicebuilder.vote/
       git checkout 4bd11a9bcdc7f445d7596141a034104938e08b22
@@ -141,23 +146,15 @@ Now, use the following commands to build the microservers containers.
 
 Build the web-app microservice container
 
-```bash
+```shell
 cd sample.microservicebuilder.web-app
 docker build -t registry.ng.bluemix.net/<namespace>/microservice-webapp .
 docker push registry.ng.bluemix.net/<namespace>/microservice-webapp
 ```
 
-Build the vote microservice container
-
-```bash
-cd sample.microservicebuilder.vote
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
-docker push registry.ng.bluemix.net/<namespace>/microservice-vote
-```
-
 Build the schedule microservice container
 
-```bash
+```shell
 cd sample.microservicebuilder.schedule
 docker build -t registry.ng.bluemix.net/<namespace>/microservice-schedule .
 docker push registry.ng.bluemix.net/<namespace>/microservice-schedule
@@ -165,7 +162,7 @@ docker push registry.ng.bluemix.net/<namespace>/microservice-schedule
 
 Build the speaker microservice container
 
-```bash
+```shell
 cd sample.microservicebuilder.speaker
 docker build -t registry.ng.bluemix.net/<namespace>/microservice-speaker .
 docker push registry.ng.bluemix.net/<namespace>/microservice-speaker
@@ -173,11 +170,21 @@ docker push registry.ng.bluemix.net/<namespace>/microservice-speaker
 
 Build the session microservice container
 
-```bash
+```shell
 cd sample.microservicebuilder.session
 docker build -t registry.ng.bluemix.net/<namespace>/microservice-session .
 docker push registry.ng.bluemix.net/<namespace>/microservice-session
 ```
+
+Build the vote microservice container
+
+```shell
+cd sample.microservicebuilder.vote
+docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
+docker push registry.ng.bluemix.net/<namespace>/microservice-vote
+```
+
+> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you really want to build your own version 2 vote image, please follow [this instructions](ubuntu.md) on how to build it on Docker Ubuntu.
 
 # 3. Inject Istio Envoys on Java MicroProfile Application
 
@@ -185,33 +192,65 @@ Before you proceed to the following steps, change the `<namespace>` in your yaml
 >Note: If you ran the **get_code** script, your namespace is already changed.
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
-```bash
+```shell
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 ```
 
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
-```
+```shell
 $ kubectl get pods
-NAME                                            READY     STATUS    RESTARTS
-istio-egress-3850639395-30d1v                   1/1       Running   0       
-istio-ingress-4068702052-2st6r                  1/1       Running   0       
-istio-pilot-251184572-x9dd4                     2/2       Running   0       
-istio-mixer-2499357295-kn4vq                    1/1       Running   0       
-microservice-schedule-sample-1128108920-bmfzp   2/2       Running   0          
-microservice-session-sample-1072599709-3bx9d    2/2       Running   0          
-microservice-speaker-sample-1948947026-f22n3    2/2       Running   0          
-microservice-vote-sample-3285487307-v8518       2/2       Running   0          
-microservice-webapp-sample-3174273294-4b877     2/2       Running   0     
+NAME                                           READY     STATUS      RESTARTS   AGE
+cloudant-db-4102896723-6ztmw                   2/2       Running     0          1h
+cloudant-secret-generator-deploy-lwmrs         1/2       Completed   0          4h
+istio-egress-3946387492-5wtbm                  1/1       Running     0          2d
+istio-ingress-4179457893-clzjf                 1/1       Running     0          2d
+istio-mixer-2598054512-bm3st                   1/1       Running     0          2d
+istio-pilot-2676867826-z63pq                   2/2       Running     0          2d
+microservice-schedule-sample-971365647-74648   2/2       Running     0          2d
+microservice-session-sample-2341329899-2bjhg   2/2       Running     0          2d
+microservice-speaker-sample-1294850951-w76b5   2/2       Running     0          2d
+microservice-vote-sample-v1-3410940397-9cm8m   2/2       Running     0          1h
+microservice-vote-sample-v2-3728755778-5c4vx   2/2       Running     0          1h
+microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d   
 ```
-# 4. Access your Application
+# 4. Split your Traffic and Access your Application
 
-we want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
+Now you have 2 different version of microservice vote sample, let's create a new Istio Mixer rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
 
-```bash
+```yaml
+type: route-rule
+name: vote-default
+spec:
+  destination: vote-service.default.svc.cluster.local
+  precedence: 1
+  route:
+  - tags:
+      version: v1
+    weight: 50
+  - tags:
+      version: v2
+    weight: 50
+```
+
+This route-rule will let each version recieve half of the traffic. You can change the **weight** to split more traffic on a particular version. Just remember all the weights must added up to 100.
+
+Now let's apply this rule to your Istio Mixer.
+
+```shell
+istioctl create -f manifests/route-rule-vote.yaml
+istioctl get route-rules -o yaml #You can view all your route-rules by executing this command
+```
+
+Now each version of your vote microservice should recieve half of the traffic. Let's test it out by accessing your application.
+
+To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
+
+```shell
 kubectl create -f manifests/ingress.yaml
 ```
 
@@ -229,12 +268,12 @@ Congratulation, you MicroProfile application is running and it should look like 
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
 * First, go back to your Isito's main directory. Install the required Istio Addons on your cluster: [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com)
-  ```bash
+  ```shell
   kubectl apply -f install/kubernetes/addons/prometheus.yaml
   kubectl apply -f install/kubernetes/addons/grafana.yaml
   ```
 * Verify that your **Grafana** dashboard is ready. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Grafana service `kubectl get svc | grep grafana` or you can run the following command to output both:
-  ```bash
+  ```shell
   $ echo $(kubectl get po -l app=grafana -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc grafana -o jsonpath={.spec.ports[0].nodePort})
   184.xxx.yyy.zzz:30XYZ
   ```
@@ -243,7 +282,7 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
   ![Grafana-Dashboard](images/grafana.png)
 
 * To collect new telemetry data, you will use `istio mixer rule create`. For this sample, you will generate logs for Response Size for vote service.
-  ```bash
+  ```shell
   $ istioctl mixer rule get vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local
   Error: the server could not find the requested resource
   ```
