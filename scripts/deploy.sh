@@ -49,11 +49,12 @@ echo "Finished Istio Control Plane setup."
 echo "Creating Java MicroProfile with Injected Envoys..."
 cd ..
 kubectl create -f manifests/ingress.yaml
-kubectl create -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
-kubectl create -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
-kubectl create -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
-kubectl create -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
-kubectl create -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 
 PODS=$(kubectl get pods | grep Init)
 while [ ${#PODS} -ne 0 ]
