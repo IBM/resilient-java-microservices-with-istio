@@ -184,7 +184,7 @@ docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
 docker push registry.ng.bluemix.net/<namespace>/microservice-vote
 ```
 
-> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you really want to build your own version 2 vote image, please follow [this instructions](ubuntu.md) on how to build it on Docker Ubuntu.
+> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you really want to build your own version 2 vote image, please follow [this instruction](ubuntu.md) on how to build it on Docker Ubuntu.
 
 # 3. Inject Istio Envoys on Java MicroProfile Application
 
@@ -237,7 +237,7 @@ spec:
     weight: 50
 ```
 
-This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Just remember all the weights must added up to 100.
+This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Just make sure all the weights must added up to 100.
 
 Now let's apply this rule to your Istio Mixer.
 
@@ -256,8 +256,8 @@ kubectl create -f manifests/ingress.yaml
 
 To access your application, you can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-$ echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
-IP:NodePort #e.g. 184.172.247.2:30344
+echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+#This should output your IP:NodePort e.g. 184.172.247.2:30344
 ```
 
 Point your browser to:  
@@ -265,7 +265,7 @@ Point your browser to:
 
 Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
 
-> Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition for creating the new databases.
+> Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
 # 5. Collecting Metrics and Logs
 This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
@@ -304,6 +304,7 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
             target: target.service | "unknown"
             service: target.labels["app"] | "unknown"
             method: request.path | "unknown"
+            version: target.labels["version"] | "unknown"
             response_code: response.code | 200
     - adapter: default
       kind: access-logs
@@ -335,52 +336,44 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
             userAgent: request.headers["user-agent"]
   ```
 * Create the configuration on Istio Mixer.
-  ```bash
+  ```shell
   istioctl mixer rule create vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local -f new_rule.yaml
   ```
-* Send traffic to that service by refreshing your browser to `http://184.xxx.yyy.zzz:30XYZ/productpage` multiple times. You can also do `curl` on your terminal to that URL in a while loop.
 
 * Verify that the new metric is being collected by going to your Grafana dashboard again. The graph on the rightmost should now be populated.
 ![grafana-new-metric](images/grafana-new-metric.png)
 
 * Verify that the logs stream has been created and is being populated for requests
   ```bash
-  $ kubectl logs $(kubectl get pods -l istio=mixer -o jsonpath='{.items[0].metadata.name}') | grep \"combined_log\"
-  {"logName":"combined_log","labels":{"referer":"","responseSize":871,"timestamp":"2017-04-29T02:11:54.989466058Z","url":"/reviews","userAgent":"python-requests/2.11.1"},"textPayload":"- - - [29/Apr/2017:02:11:54 +0000] \"- /reviews -\" - 871 - python-requests/2.11.1"}
-  ...
-  ...
-  ...
+  kubectl logs $(kubectl get pods -l istio=mixer -o jsonpath='{.items[0].metadata.name}') | grep \"combined_log\"
+  # {"logName":"combined_log","labels":{"method":"POST","protocol":"http","referer":"http://184.172.247.6:32234/sessions","responseCode":200,"responseSize":127,"timestamp":"2017-06-15T17:38:50.192990641Z","url":"/vote/rate","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0"},"textPayload":"- - - [15/Jun/2017:17:38:50 +0000] \"POST /vote/rate http\" 200 127 http://184.172.247.6:32234/sessions Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0"}
   ```
 
 [Collecting Metrics and Logs on Istio](https://istio.io/docs/tasks/metrics-logs.html)
 # 6. Request Tracing
 This step shows you how to collect trace spans using [Zipkin](http://zipkin.io).
 * Install the required Istio Addon: [Zipkin](http://zipkin.io)
-  ```bash
-  $ kubectl apply -f install/kubernetes/addons/zipkin.yaml
+  ```shell
+  kubectl apply -f install/kubernetes/addons/zipkin.yaml
   ```
 * Access your **Zipkin Dashboard**. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Zipkin service `kubectl get svc | grep zipkin` or you can run the following command to output both:
-  ```bash
-  $ echo $(kubectl get po -l app=zipkin -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc zipkin -o jsonpath={.spec.ports[0].nodePort})
-  184.xxx.yyy.zzz:30XYZ
+  ```shell
+  echo $(kubectl get po -l app=zipkin -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc zipkin -o jsonpath={.spec.ports[0].nodePort})
+  # 184.xxx.yyy.zzz:30XYZ
   ```  
   Your dashboard should like this:
   ![zipkin](images/zipkin.png)
 
-* Send traffic to that service by refreshing your browser to `http://184.xxx.yyy.zzz:30XYZ/productpage` multiple times. You can also do `curl` on your terminal to that URL in a while loop.
-
-* Go to your Zipkin Dashboard again and you will see a number of traces done.
+* Click on Find Traces button with the appropriate Start and End Time and you will see a number of traces done. 
 ![zipkin](images/zipkin-traces.png)
-* Click on one those traces and you will see the details of the traffic you sent to your BookInfo App. It shows how much time it took for the request on `productpage`. It also shows how much time ot took for the requests on the `details`,`reviews`, and `ratings` services.
-![zipkin](images/zipkin-details.png)
 
-[Zipkin Tracing on Istio](https://istio.io/docs/tasks/zipkin-tracing.html)
+You can explore more features with Zipkin via [Zipkin Tracing on Istio](https://istio.io/docs/tasks/zipkin-tracing.html).
 
 # Troubleshooting
 * To delete Istio from your cluster
-```bash
-$ kubectl delete -f install/kubernetes/istio-rbac-alpha.yaml # or istio-rbac-beta.yaml
-$ kubectl delete -f install/kubernetes/istio.yaml
+```shell
+kubectl delete -f install/kubernetes/istio-rbac-alpha.yaml # or istio-rbac-beta.yaml
+kubectl delete -f install/kubernetes/istio.yaml
 ```
 
 # References

@@ -10,11 +10,13 @@ spec:
     metadata:
       labels:
         name: session-deployment
+        app: session-deployment
+        version: v1
     spec:
       containers:
       - name: microservice-session
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-session
+        image: tomcli/microservice-session
         ports:
           - containerPort: 9080
 

@@ -10,11 +10,13 @@ spec:
     metadata:
       labels:
         name: schedule-deployment
+        app: schedule-deployment
+        version: v1
     spec:
       containers:
       - name: microservice-schedule
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-schedule
+        image: tomcli/microservice-schedule
         ports:
           - containerPort: 9080
 ---

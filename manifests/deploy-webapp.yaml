@@ -10,11 +10,13 @@ spec:
     metadata:
       labels:
         name: webapp-deployment
+        app: webapp-deployment
+        version: v1
     spec:
       containers:
       - name: microservice-webapp
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-webapp
+        image: tomcli/microservice-webapp
         ports:
           - containerPort: 9080
 ---

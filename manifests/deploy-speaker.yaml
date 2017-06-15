@@ -10,11 +10,13 @@ spec:
     metadata:
       labels:
         name: speaker-deployment
+        app: speaker-deployment
+        version: v1
     spec:
       containers:
       - name: microservice-speaker
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-speaker
+        image: tomcli/microservice-speaker
         ports:
           - containerPort: 9080
 ---
