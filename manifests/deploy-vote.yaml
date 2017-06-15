@@ -17,7 +17,7 @@ spec:
       containers:
       - name: microservice-vote
         #change the image name
-        image: tomcli/microservice-vote
+        image: registry.ng.bluemix.net/<namespace>/microservice-vote
         ports:
           - containerPort: 9080
 ---

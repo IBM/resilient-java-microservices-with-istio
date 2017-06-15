@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-schedule
         #change the image name
-        image: tomcli/microservice-schedule
+        image: registry.ng.bluemix.net/<namespace>/microservice-schedule
         ports:
           - containerPort: 9080
 ---
