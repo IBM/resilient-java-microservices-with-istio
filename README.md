@@ -19,6 +19,7 @@ In this code we demonstrate how to deploy, connect, manage and monitor Java micr
 - [Grafana](http://docs.grafana.org/guides/getting_started)
 - [Zipkin](http://zipkin.io/)
 - [Prometheus](https://prometheus.io/)
+- [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix container service](https://console.ng.bluemix.net/catalog/?taxonomyNavigation=apps&category=containers)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 
@@ -277,7 +278,7 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
 * Verify that your **Grafana** dashboard is ready. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Grafana service `kubectl get svc | grep grafana` or you can run the following command to output both:
   ```shell
   $ echo $(kubectl get po -l app=grafana -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc grafana -o jsonpath={.spec.ports[0].nodePort})
-  184.xxx.yyy.zzz:30XYZ
+  # 184.xxx.yyy.zzz:30XYZ
   ```
   Point your browser to `184.xxx.yyy.zzz:30XYZ/dashboard/db/istio-dashboard` to go directly to your dashboard.  
   Your dashboard should look like this:  
@@ -340,7 +341,9 @@ This step shows you how to configure [Istio Mixer](https://istio.io/docs/concept
   istioctl mixer rule create vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local -f new_rule.yaml
   ```
 
-* Verify that the new metric is being collected by going to your Grafana dashboard again. The graph on the rightmost should now be populated.
+* Verify that the new metric is being collected by going to your Grafana dashboard via this link `184.xxx.yyy.zzz:30XYZ/dashboard/db/istio-dashboard?var-source=All&var-target=All&var-version=v1&var-version=v2&var-service=vote-deployment` 
+
+* The graph on the rightmost should now be populated.
 ![grafana-new-metric](images/grafana-new-metric.png)
 
 * Verify that the logs stream has been created and is being populated for requests
