@@ -5,7 +5,7 @@
 
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes.
 
-Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy and scale them? Moving forward, how do we collect metrics about about traffic behavior, which can be used to enforce policy decisions such as fine-grained access control and rate limits? Enter service mesh. A service mesh, necessity for today's cloud-native applications, is a layer for making microservices inter communication secure, fast, reliable, and enable deeper insights into the microservices metrics. 
+Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy and scale them? Moving forward, how do we collect metrics about traffic behavior, which can be used to enforce policy decisions such as fine-grained access control and rate limits? Enter service mesh. A service mesh, necessity for today's cloud-native applications, is a layer for making microservices intercommunication secure, fast, reliable, and enable deeper insights into the microservices metrics. 
 
 [Istio](http://istio.io) is an open platform that provides a uniform way to connect, manage, and secure microservices. Istio is the result of a joint collaboration between IBM, Google and Lyft as a means to support traffic flow management, access policy enforcement and the telemetry data aggregation between microservices, all without requiring changes to the code of your microservice. Istio provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars, an extended version of the  [Envoy](https://lyft.github.io/envoy/) proxy, in the same Pod as your microservice.
 
@@ -24,7 +24,7 @@ In this code we demonstrate how to deploy, connect, manage and monitor Java micr
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 
 # Prerequisite
-Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
+Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
 
 # Deploy to Bluemix
 If you want to deploy the Java MicroProfile app directly to Bluemix, click on 'Deploy to Bluemix' button below to create a [Bluemix DevOps service toolchain and pipeline](https://console.ng.bluemix.net/docs/services/ContinuousDelivery/toolchains_about.html#toolchains_about) for deploying the sample, else jump to [Steps](#steps)
@@ -74,7 +74,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
       $ kubectl apply -f install/kubernetes/istio-rbac-beta.yaml
       ```
 
-    * If **your cluster has no RBAC** enabled, proceed to installing the **Control Plane**.
+    * If **your cluster has no RBAC** enabled, proceed to install the **Control Plane**.
 
 ## 1.3 Install the [Istio Control Plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) in your cluster  
 ```shell
@@ -86,7 +86,7 @@ $ kubectl get pods
 NAME                              READY     STATUS    RESTARTS
 istio-egress-3850639395-30d1v     1/1       Running   0       
 istio-ingress-4068702052-2st6r    1/1       Running   0       
-istio-manager-251184572-x9dd4     2/2       Running   0       
+istio-pilot-251184572-x9dd4       2/2       Running   0       
 istio-mixer-2499357295-kn4vq      1/1       Running   0       
 ```
 * _(Optional) For more options/addons such as installing Istio with [Auth feature](https://istio.io/docs/concepts/network-and-auth/auth.html) and [collecting telemetry data](https://istio.io/docs/tasks/metrics-logs.html), go [here](https://istio.io/docs/tasks/installing-istio.html#prerequisites)._
@@ -143,7 +143,7 @@ bx cr namespace-add <namespace> #replace <namespace> with any name.
 
 * `mvn clean package` in each ../sample.microservicebuilder.* projects
 
-Now, use the following commands to build the microservers containers.
+Now, use the following commands to build the microservice containers.
 
 Build the web-app microservice container
 
@@ -202,7 +202,7 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml --includeI
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 ```
 
-After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, and webapp**. 
+After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote-v1, vote-v2, cloudant, and webapp**. 
 ```shell
 $ kubectl get pods
 NAME                                           READY     STATUS      RESTARTS   AGE
@@ -238,7 +238,7 @@ spec:
     weight: 50
 ```
 
-This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Just make sure all the weights must added up to 100.
+This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Make sure all the weights add up to 100.
 
 Now let's apply this rule to your Istio Mixer.
 
