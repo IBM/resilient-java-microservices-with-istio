@@ -37,12 +37,16 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 # Steps
 
-1. [Installing Istio](#1-installing-istio-in-your-cluster)
-2. [Get and build the application code](#2-get-and-build-the-application-code)
-3. [Inject Istio on Java MicroProfile App](#3-inject-istio-envoys-on-java-microprofile-application)
-4. [Split Your Traffic and Access your Application](#4-split-your-traffic-and-access-your-application)
-5. [Collecting Metrics and Logs](#5-collecting-metrics-and-logs)
-6. [Request Tracing](#6-request-tracing)
+## Part A: Building microservices and enabling ingress traffic
+
+1. [Get and build the application code](#2-get-and-build-the-application-code)
+2. [Deploy application microservices and Istio envoys](#3-inject-istio-envoys-on-java-microprofile-application)
+
+## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
+
+3. [Create a content-based routing for your microservices](#4-split-your-traffic-and-access-your-application)
+4. [Add resiliency Feature - Circuit Breakers]()
+5. [Create fault injection to test your circuit breaker]()
 
 #### [Troubleshooting](#troubleshooting-1)
 
