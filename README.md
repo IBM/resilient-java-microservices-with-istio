@@ -53,7 +53,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 
 ## Part A: Building microservices and enabling ingress traffic
-# 1. Get and build the application code
+## 1. Get and build the application code
 
 Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) installed on your machine.
 
@@ -149,7 +149,7 @@ docker push registry.ng.bluemix.net/<namespace>/microservice-vote
 
 > For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you want to build your own version 2 vote image, please follow [this instruction](ubuntu.md) on how to build it on Docker Ubuntu.
 
-# 2. Deploy application microservices and Istio envoys
+## 2. Deploy application microservices and Istio envoys
 
 Before you proceed to the following steps, change the `<namespace>` in your yaml files to your own namespace.
 >Note: If you ran the **get_code** script, your namespace is already changed.
@@ -202,7 +202,7 @@ Congratulation, you MicroProfile application is running and it should look like 
 
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
 
-# 3. Create a content-based routing for your microservices
+## 3. Create a content-based routing for your microservices
 
 > Note: Currently the route matching rule is not working within Istio ingress network because there's a bug in Istio 0.1.6. For now, we will show you how to use route-rule to split the traffic for each version. Content-based routing is simply adding matching rule for your content on top of your traffic rule.
 
@@ -238,9 +238,9 @@ Point your browser to:  `http://<IP:NodePort>` Replace with your own IP and Node
 
 > Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
-# 4. Add resiliency Feature - Circuit Breakers
+## 4. Add resiliency Feature - Circuit Breakers
 
-# 5. Create fault injection to test your circuit breaker
+## 5. Create fault injection to test your circuit breaker
 
 # Troubleshooting
 * To delete Istio from your cluster, run the following commands in your istio directory
