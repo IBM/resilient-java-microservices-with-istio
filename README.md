@@ -55,7 +55,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 ## Part A: Building microservices and enabling ingress traffic
 ## 1. Get and build the application code
 
-Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) installed on your machine.
+Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) and [Docker](https://www.docker.com/community-edition#/download) installed on your machine.
 
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
