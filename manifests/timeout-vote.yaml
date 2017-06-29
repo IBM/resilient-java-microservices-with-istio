@@ -1,0 +1,8 @@
+type: route-rule
+name: timeout
+spec:
+  destination: vote-service.default.svc.cluster.local
+  httpReqTimeout:
+    simpleTimeout:
+      timeout: 1s
+      
