@@ -49,7 +49,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
 4. [Add resiliency Feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Create fault injection to test your circuit breaker](#5-create-fault-injection-to-test-your-circuit-breaker)
+5. [Create fault injection to test your fault tolerance](#5-create-fault-injection-to-test-your-fault-tolerance)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -236,13 +236,48 @@ istioctl get route-rules -o yaml #You can view all your route-rules by executing
 
 Now each version of your vote microservice should receive half of the traffic. Let's test it out by accessing your application.
 
-Point your browser to:  `http://<IP:NodePort>` Replace with your own IP and NodePort.
+Point your browser to:  
+`http://<IP:NodePort>` Replace with your own IP and NodePort.
 
 > Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
 ## 4. Add resiliency Feature - Circuit Breakers
 
-## 5. Create fault injection to test your circuit breaker
+Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Now we will show you how to enable circuit breaker when your Database is broken.
+
+In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
+
+```shell
+istioctl create -f manifests/route-rule-v2.yaml
+```
+
+Create a circuit breaker policy on your cloudant service.
+
+```shell
+istioctl create -f manifests/circuit-breaker-db.yaml
+```
+
+> Instructions for testing coming soon.
+
+## 5. Create fault injection to test your fault tolerance
+
+In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. Here's an example to demonstrate how can you create and test your fault tolerance. 
+
+An example of fault tolerance is timeout. Let's apply a 1-second timeout on your Vote service.
+
+```shell
+istioctl create -f manifests/timeout-vote.yaml
+```
+
+Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
+
+```shell
+istioctl create -f manifests/fault-injection.yaml
+```
+
+Now point your browser to:  `http://<IP:NodePort>` 
+
+Next, enable your developer mode on your browser and click on network. Then, click **Vote** on the microprofile site. Now you should able to see a 504 timeout error for the GET request on `http://<IP:NodePort>/vote/rate` since cloudant needs more than one second to response back to the vote service.
 
 # Troubleshooting
 * To delete Istio from your cluster, run the following commands in your istio directory
