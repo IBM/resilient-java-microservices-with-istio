@@ -190,9 +190,15 @@ To access your application, you want to create an ingress to connect all the mic
 kubectl create -f manifests/ingress.yaml
 ```
 
+Since we have 2 version of vote deployment, we need to setup a route rule to avoid version conflict. The following route rule will sent all the traffic to version 1 vote deployment.
+
+```shell
+istioctl create -f manifests/route-rule-v1.yaml
+```
+
 You can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+echo $(kubectl get pod -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
 #This should output your IP:NodePort e.g. 184.172.247.2:30344
 ```
 
@@ -248,7 +254,7 @@ Circuit breaking is a critical component of distributed systems. It’s nearly a
 In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
 
 ```shell
-istioctl create -f manifests/route-rule-v2.yaml
+istioctl replace -f manifests/route-rule-v2.yaml
 ```
 
 Create a circuit breaker policy on your cloudant service.
@@ -257,7 +263,29 @@ Create a circuit breaker policy on your cloudant service.
 istioctl create -f manifests/circuit-breaker-db.yaml
 ```
 
-> Instructions for testing coming soon.
+Now take a look at the circuit breaker rule you just created. The circuit breaker will fail eject requests when there's more than one connection or pending request. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant-db Envoy and eject all their requests for 15 minutes. 
+
+```yaml
+type: destination-policy
+name: db-circuit
+spec:
+  destination: cloudant-service.default.svc.cluster.local
+  policy:
+    - circuitBreaker:
+        simpleCb:
+          maxConnections: 1
+          httpMaxRequests: 1
+          httpMaxRequestsPerConnection: 1
+          httpConsecutiveErrors: 1
+          sleepWindow: 15m
+          httpDetectionInterval: 1s
+          httpMaxEjectionPercent: 100
+          httpMaxPendingRequests: 1
+```
+
+Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode** on your browser, and click on **network**. Go to Speaker or Session and try to vote 5 times within a second. Then, you should see the last 2 to 3 vote will return a server error because there are more than one pending request get sent to cloudant. Therefore, the circuit breaker will eject the rest of the requests.
+
+> Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
 ## 5. Create fault injection to test your fault tolerance
 
@@ -277,7 +305,7 @@ istioctl create -f manifests/fault-injection.yaml
 
 Now point your browser to:  `http://<IP:NodePort>` 
 
-Next, enable your developer mode on your browser and click on network. Then, click **Vote** on the microprofile site. Now you should able to see a 504 timeout error for the GET request on `http://<IP:NodePort>/vote/rate` since cloudant needs more than one second to response back to the vote service.
+Next, enable your **developer mode** on your browser and click on **network**. Then, click **Vote** on the microprofile site. Now you should able to see a 504 timeout error for the GET request on `http://<IP:NodePort>/vote/rate` since cloudant needs more than one second to response back to the vote service.
 
 # Troubleshooting
 * To delete Istio from your cluster, run the following commands in your istio directory

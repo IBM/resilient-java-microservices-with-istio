@@ -10,9 +10,7 @@ spec:
           httpMaxRequestsPerConnection: 1
           httpConsecutiveErrors: 1
           sleepWindow: 15m
-          httpDetectionInterval: 1m
+          httpDetectionInterval: 1s
           httpMaxEjectionPercent: 100
           httpMaxPendingRequests: 1
-      loadBalancing: 
-        name: RANDOM
         
