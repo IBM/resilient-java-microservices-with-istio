@@ -1,0 +1,10 @@
+type: route-rule
+name: cloudant-delay
+spec:
+  destination: cloudant-service.default.svc.cluster.local
+  precedence: 2
+  httpFault:
+    delay:
+      percent: 100
+      fixedDelay: 1.1s
+      

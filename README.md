@@ -1,15 +1,17 @@
 [![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-ISTIO.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
 
-# Java MicroProfile Microservices on Istio
+# Enable your Java MicroProfile Microservices with advanced traffic management features leveraging Istio 
 
 
-[MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes.
+[MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
 
-Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy and scale them? Moving forward, how do we collect metrics about traffic behavior, which can be used to enforce policy decisions such as fine-grained access control and rate limits? Enter service mesh. A service mesh, necessity for today's cloud-native applications, is a layer for making microservices intercommunication secure, fast, reliable, and enable deeper insights into the microservices metrics. 
+Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy and scale them? Moving forward, how do we collect metrics about traffic behavior, which can be used to enforce policy decisions such as fine-grained access control and rate limits? Enter service mesh and Istio, which allows us to connect, manage, and secure microservices, and enable deeper insights into the microservices metrics. Istio provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars, an extended version of the  [Envoy](https://lyft.github.io/envoy/) proxy, in the same Pod as your microservice.
 
-[Istio](http://istio.io) is an open platform that provides a uniform way to connect, manage, and secure microservices. Istio is the result of a joint collaboration between IBM, Google and Lyft as a means to support traffic flow management, access policy enforcement and the telemetry data aggregation between microservices, all without requiring changes to the code of your microservice. Istio provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars, an extended version of the  [Envoy](https://lyft.github.io/envoy/) proxy, in the same Pod as your microservice.
+In this code we demonstrate how to build, deploy, connect, manage and monitor Java MicroProfile microservices leveraging Istio service mesh. Once this is done, specific features from Istio we dive in are.  
 
-In this code we demonstrate how to deploy, connect, manage and monitor Java microservices leveraging MicroProfile on Istio service mesh.
+Canary deployment: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
+
+Circuit Breakers: Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible.
 
 ![MicroProfile-Istio](images/MicroProfile-Istio.png)
 
@@ -24,7 +26,8 @@ In this code we demonstrate how to deploy, connect, manage and monitor Java micr
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 
 # Prerequisite
-Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
+- Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
+- You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio getting started](https://github.com/IBM/Istio-getting-started), to get Istio mesh installed on Kubernetes.
 
 # Deploy to Bluemix
 If you want to deploy the Java MicroProfile app directly to Bluemix, click on 'Deploy to Bluemix' button below to create a [Bluemix DevOps service toolchain and pipeline](https://console.ng.bluemix.net/docs/services/ContinuousDelivery/toolchains_about.html#toolchains_about) for deploying the sample, else jump to [Steps](#steps)
@@ -37,63 +40,24 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 # Steps
 
-1. [Installing Istio](#1-installing-istio-in-your-cluster)
-2. [Get and build the application code](#2-get-and-build-the-application-code)
-3. [Inject Istio on Java MicroProfile App](#3-inject-istio-envoys-on-java-microprofile-application)
-4. [Split Your Traffic and Access your Application](#4-split-your-traffic-and-access-your-application)
-5. [Collecting Metrics and Logs](#5-collecting-metrics-and-logs)
-6. [Request Tracing](#6-request-tracing)
+## Part A: Building microservices and enabling ingress traffic
+
+1. [Get and build the application code](#1-get-and-build-the-application-code)
+2. [Deploy application microservices and Istio envoys](#2-deploy-application-microservices-and-istio-envoys)
+
+## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
+
+3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
+4. [Add resiliency Feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
+5. [Create fault injection to test your fault tolerance](#5-create-fault-injection-to-test-your-fault-tolerance)
 
 #### [Troubleshooting](#troubleshooting-1)
 
-# 1. Installing Istio in your Cluster
-## 1.1 Download the Istio source
-  1. Download the latest Istio release for your OS: [Istio releases](https://github.com/istio/istio/releases)  
-  2. Extract and go to the root directory.
-  3. Copy the `istioctl` bin to your local bin  
-  ```shell
-  $ cp bin/istioctl /usr/local/bin
-  ## example for macOS
-  ```
 
-## 1.2 Grant Permissions  
-  1. Run the following command to check if your cluster has RBAC  
-  ```shell
-  $ kubectl api-versions | grep rbac
-  ```  
-  2. Grant permissions based on the version of your RBAC  
-    * If you have an **alpha** version, run:
+## Part A: Building microservices and enabling ingress traffic
+## 1. Get and build the application code
 
-      ```shell
-      $ kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
-      ```
-
-    * If you have a **beta** version, run:
-
-      ```shell
-      $ kubectl apply -f install/kubernetes/istio-rbac-beta.yaml
-      ```
-
-    * If **your cluster has no RBAC** enabled, proceed to install the **Control Plane**.
-
-## 1.3 Install the [Istio Control Plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) in your cluster  
-```shell
-kubectl apply -f install/kubernetes/istio.yaml
-```
-You should now have the Istio Control Plane running in Pods of your Cluster.
-```shell
-$ kubectl get pods
-NAME                              READY     STATUS    RESTARTS
-istio-egress-3850639395-30d1v     1/1       Running   0       
-istio-ingress-4068702052-2st6r    1/1       Running   0       
-istio-pilot-251184572-x9dd4       2/2       Running   0       
-istio-mixer-2499357295-kn4vq      1/1       Running   0       
-```
-* _(Optional) For more options/addons such as installing Istio with [Auth feature](https://istio.io/docs/concepts/network-and-auth/auth.html) and [collecting telemetry data](https://istio.io/docs/tasks/metrics-logs.html), go [here](https://istio.io/docs/tasks/installing-istio.html#prerequisites)._
-
-# 2. Get and build the application code
-
-Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) installed on your machine.
+Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) and [Docker](https://www.docker.com/community-edition#/download) installed on your machine.
 
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
@@ -185,21 +149,21 @@ docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
 docker push registry.ng.bluemix.net/<namespace>/microservice-vote
 ```
 
-> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you really want to build your own version 2 vote image, please follow [this instruction](ubuntu.md) on how to build it on Docker Ubuntu.
+> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you want to build your own version 2 vote image, please follow [this instruction](ubuntu.md) on how to build it on Docker Ubuntu.
 
-# 3. Inject Istio Envoys on Java MicroProfile Application
+## 2. Deploy application microservices and Istio envoys
 
 Before you proceed to the following steps, change the `<namespace>` in your yaml files to your own namespace.
 >Note: If you ran the **get_code** script, your namespace is already changed.
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```shell
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 ```
 
 After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote-v1, vote-v2, cloudant, and webapp**. 
@@ -219,7 +183,30 @@ microservice-vote-sample-v1-3410940397-9cm8m   2/2       Running     0          
 microservice-vote-sample-v2-3728755778-5c4vx   2/2       Running     0          1h
 microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d   
 ```
-# 4. Split your Traffic and Access your Application
+
+To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
+
+```shell
+kubectl create -f manifests/ingress.yaml
+```
+
+You can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
+```bash
+echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+#This should output your IP:NodePort e.g. 184.172.247.2:30344
+```
+
+Point your browser to:  
+`http://<IP:NodePort>` Replace with your own IP and NodePort.
+
+Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
+
+
+## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
+
+## 3. Create a content-based routing for your microservices
+
+> Note: Currently the route matching rule is not working within Istio ingress network because there's a bug in Istio 0.1.6. For now, we will show you how to use route-rule to split the traffic for each version. Content-based routing is simply adding matching rule for your content on top of your traffic rule.
 
 Now you have 2 different version of microservice vote sample, let's create a new Istio Mixer rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
 
@@ -249,134 +236,58 @@ istioctl get route-rules -o yaml #You can view all your route-rules by executing
 
 Now each version of your vote microservice should receive half of the traffic. Let's test it out by accessing your application.
 
-To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
-
-```shell
-kubectl create -f manifests/ingress.yaml
-```
-
-To access your application, you can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
-```bash
-echo $(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
-#This should output your IP:NodePort e.g. 184.172.247.2:30344
-```
-
 Point your browser to:  
 `http://<IP:NodePort>` Replace with your own IP and NodePort.
 
-Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
-
 > Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
-# 5. Collecting Metrics and Logs
-This step shows you how to configure [Istio Mixer](https://istio.io/docs/concepts/policy-and-control/mixer.html) to gather telemetry for services in your cluster.
-* First, go back to your Isito's main directory. Install the required Istio Addons on your cluster: [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com)
-  ```shell
-  kubectl apply -f install/kubernetes/addons/prometheus.yaml
-  kubectl apply -f install/kubernetes/addons/grafana.yaml
-  ```
-* Verify that your **Grafana** dashboard is ready. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Grafana service `kubectl get svc | grep grafana` or you can run the following command to output both:
-  ```shell
-  $ echo $(kubectl get po -l app=grafana -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc grafana -o jsonpath={.spec.ports[0].nodePort})
-  # 184.xxx.yyy.zzz:30XYZ
-  ```
-  Point your browser to `184.xxx.yyy.zzz:30XYZ/dashboard/db/istio-dashboard` to go directly to your dashboard.  
-  Your dashboard should look like this:  
-  ![Grafana-Dashboard](images/grafana.png)
+## 4. Add resiliency Feature - Circuit Breakers
 
-* To collect new telemetry data, you will use `istio mixer rule create`. For this sample, you will generate logs for Response Size for vote service.
-  ```shell
-  $ istioctl mixer rule get vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local
-  Error: the server could not find the requested resource
-  ```
-* Create a configuration YAML file and name it as `new_rule.yaml`:
-  ```yaml
-  revision: "1"
-  rules:
-  - aspects:
-    - adapter: prometheus
-      kind: metrics
-      params:
-        metrics:
-        - descriptor_name: response_size
-          value: response.size | 0
-          labels:
-            source: source.labels["app"] | "unknown"
-            target: target.service | "unknown"
-            service: target.labels["app"] | "unknown"
-            method: request.path | "unknown"
-            version: target.labels["version"] | "unknown"
-            response_code: response.code | 200
-    - adapter: default
-      kind: access-logs
-      params:
-        logName: combined_log
-        log:
-          descriptor_name: accesslog.combined
-          template_expressions:
-            originIp: origin.ip
-            sourceUser: origin.user
-            timestamp: request.time
-            method: request.method
-            url: request.path
-            protocol: request.scheme
-            responseCode: response.code
-            responseSize: response.size
-            referer: request.referer
-            userAgent: request.headers["user-agent"]
-          labels:
-            originIp: origin.ip
-            sourceUser: origin.user
-            timestamp: request.time
-            method: request.method
-            url: request.path
-            protocol: request.scheme
-            responseCode: response.code
-            responseSize: response.size
-            referer: request.referer
-            userAgent: request.headers["user-agent"]
-  ```
-* Create the configuration on Istio Mixer.
-  ```shell
-  istioctl mixer rule create vote-deployment.default.svc.cluster.local vote-deployment.default.svc.cluster.local -f new_rule.yaml
-  ```
+Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Now we will show you how to enable circuit breaker when your Database is broken.
 
-* Verify that the new metric is being collected by going to your Grafana dashboard via this link `184.xxx.yyy.zzz:30XYZ/dashboard/db/istio-dashboard?var-source=All&var-target=All&var-version=v1&var-version=v2&var-service=vote-deployment` 
+In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
 
-* The graph on the rightmost should now be populated.
-![grafana-new-metric](images/grafana-new-metric.png)
+```shell
+istioctl create -f manifests/route-rule-v2.yaml
+```
 
-* Verify that the logs stream has been created and is being populated for requests
-  ```bash
-  kubectl logs $(kubectl get pods -l istio=mixer -o jsonpath='{.items[0].metadata.name}') | grep \"combined_log\"
-  # {"logName":"combined_log","labels":{"method":"POST","protocol":"http","referer":"http://184.172.247.6:32234/sessions","responseCode":200,"responseSize":127,"timestamp":"2017-06-15T17:38:50.192990641Z","url":"/vote/rate","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0"},"textPayload":"- - - [15/Jun/2017:17:38:50 +0000] \"POST /vote/rate http\" 200 127 http://184.172.247.6:32234/sessions Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0"}
-  ```
+Create a circuit breaker policy on your cloudant service.
 
-[Collecting Metrics and Logs on Istio](https://istio.io/docs/tasks/metrics-logs.html)
-# 6. Request Tracing
-This step shows you how to collect trace spans using [Zipkin](http://zipkin.io).
-* Install the required Istio Addon: [Zipkin](http://zipkin.io)
-  ```shell
-  kubectl apply -f install/kubernetes/addons/zipkin.yaml
-  ```
-* Access your **Zipkin Dashboard**. Get the IP of your cluster `kubectl get nodes` and then the NodePort of your Zipkin service `kubectl get svc | grep zipkin` or you can run the following command to output both:
-  ```shell
-  echo $(kubectl get po -l app=zipkin -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc zipkin -o jsonpath={.spec.ports[0].nodePort})
-  # 184.xxx.yyy.zzz:30XYZ
-  ```  
-  Your dashboard should like this:
-  ![zipkin](images/zipkin.png)
+```shell
+istioctl create -f manifests/circuit-breaker-db.yaml
+```
 
-* Click on Find Traces button with the appropriate Start and End Time and you will see a number of traces done. 
-![zipkin](images/zipkin-traces.png)
+> Instructions for testing coming soon.
 
-You can explore more features with Zipkin via [Zipkin Tracing on Istio](https://istio.io/docs/tasks/zipkin-tracing.html).
+## 5. Create fault injection to test your fault tolerance
+
+In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. Here's an example to demonstrate how can you create and test your fault tolerance. 
+
+An example of fault tolerance is timeout. Let's apply a 1-second timeout on your Vote service.
+
+```shell
+istioctl create -f manifests/timeout-vote.yaml
+```
+
+Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
+
+```shell
+istioctl create -f manifests/fault-injection.yaml
+```
+
+Now point your browser to:  `http://<IP:NodePort>` 
+
+Next, enable your developer mode on your browser and click on network. Then, click **Vote** on the microprofile site. Now you should able to see a 504 timeout error for the GET request on `http://<IP:NodePort>/vote/rate` since cloudant needs more than one second to response back to the vote service.
 
 # Troubleshooting
-* To delete Istio from your cluster
+* To delete Istio from your cluster, run the following commands in your istio directory
 ```shell
 kubectl delete -f install/kubernetes/istio-rbac-alpha.yaml # or istio-rbac-beta.yaml
 kubectl delete -f install/kubernetes/istio.yaml
+```
+* To delete your microprofile application, run the following commands in this Github repo's main directory
+```shell
+kubectl delete -f manifests
 ```
 
 # References

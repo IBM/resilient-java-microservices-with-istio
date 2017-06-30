@@ -1,0 +1,18 @@
+type: destination-policy
+name: db-circuit
+spec:
+  destination: cloudant-service.default.svc.cluster.local
+  policy:
+    - circuitBreaker:
+        simpleCb:
+          maxConnections: 1
+          httpMaxRequests: 1
+          httpMaxRequestsPerConnection: 1
+          httpConsecutiveErrors: 1
+          sleepWindow: 15m
+          httpDetectionInterval: 1m
+          httpMaxEjectionPercent: 100
+          httpMaxPendingRequests: 1
+      loadBalancing: 
+        name: RANDOM
+        
