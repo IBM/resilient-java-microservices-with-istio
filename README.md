@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-ISTIO.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
 
-# Enable your Java MicroProfile Microservices with advanced traffic management features leveraging Istio 
+# Enable your Java MicroProfile Microservices with advanced resiliency and traffic management features leveraging Istio 
 
 
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
@@ -9,9 +9,17 @@ Building and packaging these Java microservice is one part of the story. How do 
 
 In this code we demonstrate how to build, deploy, connect, manage and monitor Java MicroProfile microservices leveraging Istio service mesh. Once this is done, specific features from Istio we dive in are.  
 
-Canary deployment: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
+**Canary deployments**: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
 
-Circuit Breakers: Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible.
+**Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some of resiliency features it supports are: 
+
+ - Retries/Timeouts
+ - Circuit breakers
+ - Health checks
+ - Control connection pool size and request load
+ - Systematic fault injection
+
+In this code we will show how to configure and use Circuit Breakers, Fault Inection and Retries/Timeouts resiliency features for your Java Microservices application.
 
 ![MicroProfile-Istio](images/MicroProfile-Istio.png)
 
@@ -249,7 +257,9 @@ Point your browser to:
 
 ## 4. Add resiliency Feature - Circuit Breakers
 
-Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Now we will show you how to enable circuit breaker when your Database is broken.
+Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
+
+Now we will show you how to enable circuit breaker for the sample Java microservice application when your Database is broken. 
 
 In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
 
