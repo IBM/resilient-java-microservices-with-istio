@@ -267,13 +267,11 @@ In order to test this example, we want all our traffic routed to v2. Therefore, 
 istioctl replace -f manifests/route-rule-v2.yaml
 ```
 
-Create a circuit breaker policy on your cloudant service.
+Before we move on, we need to understand these different types of Circuit Breaker:
+- Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
+- Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `httpMaxPendingRequests` field.
 
-```shell
-istioctl create -f manifests/circuit-breaker-db.yaml
-```
-
-Now take a look at the circuit breaker rule you just created. The circuit breaker will fail eject requests when there's more than one connection or pending request. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant-db Envoy and eject all their requests for 15 minutes. 
+Now take a look at the circuit breaker rule for cloudant. We set the maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject all their requests for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
 
 ```yaml
 type: destination-policy
@@ -284,13 +282,18 @@ spec:
     - circuitBreaker:
         simpleCb:
           maxConnections: 1
-          httpMaxRequests: 1
-          httpMaxRequestsPerConnection: 1
-          httpConsecutiveErrors: 1
-          sleepWindow: 15m
-          httpDetectionInterval: 1s
-          httpMaxEjectionPercent: 100
           httpMaxPendingRequests: 1
+          httpConsecutiveErrors: 1     
+          sleepWindow: 15m             #required field
+          httpDetectionInterval: 1s    #required field   
+          httpMaxEjectionPercent: 100  
+```
+
+
+Create a circuit breaker policy on your cloudant service.
+
+```shell
+istioctl create -f manifests/circuit-breaker-db.yaml
 ```
 
 Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode** on your browser, and click on **network**. Go to Speaker or Session and try to vote 5 times within a second. Then, you should see the last 2 to 3 vote will return a server error because there are more than one pending request get sent to cloudant. Therefore, the circuit breaker will eject the rest of the requests.
@@ -299,9 +302,16 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 ## 5. Create fault injection to test your fault tolerance
 
-In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. Here's an example to demonstrate how can you create and test your fault tolerance. 
+Before we move on, we need to understand the idea of fault tolerance and fault injection.
 
-An example of fault tolerance is timeout. Let's apply a 1-second timeout on your Vote service.
+- Fault Tolerance: Features that keep your application continue operating properly in the event of the failure. Some of the common features are timeouts and retries.
+- Fault Injection: Introducing faults to test our application.
+
+In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. 
+
+Here's an example to demonstrate how can you create and test your fault tolerance. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. Then, in order to make sure we can trigger the fault tolerance, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant.
+
+Let's apply a 1-second timeout on your Vote service.
 
 ```shell
 istioctl create -f manifests/timeout-vote.yaml
