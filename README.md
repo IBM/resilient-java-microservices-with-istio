@@ -239,12 +239,14 @@ spec:
     weight: 50
 ```
 
-This route-rule will let each version receive half of the traffic. You can change the **weight** to split more traffic on a particular version. Make sure all the weights add up to 100.
+This route-rule will let each version receive 50% of the traffic. You can change the **weight** to split more traffic on a particular version. Make sure all the weights add up to 100.
+
+![traffic routing](images/traffic_routing.png)
 
 Now let's apply this rule to your Istio Mixer.
 
 ```shell
-istioctl create -f manifests/route-rule-vote.yaml
+istioctl replace -f manifests/route-rule-vote.yaml
 istioctl get route-rules -o yaml #You can view all your route-rules by executing this command
 ```
 
@@ -289,6 +291,8 @@ spec:
           httpMaxEjectionPercent: 100  
 ```
 
+![circuit breaker](images/circuit_breaker.png)
+
 
 Create a circuit breaker policy on your cloudant service.
 
@@ -310,6 +314,8 @@ Before we move on, we need to understand the idea of fault tolerance and fault i
 In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. 
 
 Here's an example to demonstrate how can you create and test your fault tolerance. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. Then, in order to make sure we can trigger the fault tolerance, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant.
+
+![fault tolerance](images/fault_tolerance.png)
 
 Let's apply a 1-second timeout on your Vote service.
 
