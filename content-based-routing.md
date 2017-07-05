@@ -1,7 +1,8 @@
 # Create a content-based routing for your microservices
 
 ## Prerequisite
-Make sure you go through step 1 and 2 in the main [README](README.md) before proceeding to the following steps.
+- Make sure you go through step 1 and 2 in the main [README](README.md) before proceeding to the following steps.
+- You need to install Istio 0.2.X or built your own istio pilot with the commit that's beyond Jun 30, 2017(Not stable).
 
 Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic based on their login information. First, we need to build our custom webapp image that has login function. So, run 
 
