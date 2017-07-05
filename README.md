@@ -221,8 +221,10 @@ Congratulation, you MicroProfile application is running and it should look like 
 ## 3. Create a content-based routing for your microservices
 
 > Note: Currently the route matching rule is not working within Istio ingress network because there's a bug in Istio 0.1.6. For now, we will show you how to use route-rule to split the traffic for each version. Content-based routing is simply adding matching rule for your content on top of your traffic rule.
+>
+> You can follow this [instruction](content-based-routing.md) to create a content-based routing once you have Istio 0.2.X or built your own istio pilot with commits beyond Jun 30, 2017(Not stable).
 
-Now you have 2 different version of microservice vote sample, let's create a new Istio Mixer rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
+Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
 
 ```yaml
 type: route-rule
@@ -243,7 +245,7 @@ This route-rule will let each version receive 50% of the traffic. You can change
 
 ![traffic routing](images/traffic_routing.png)
 
-Now let's apply this rule to your Istio Mixer.
+Now let's apply this rule to your Istio Pilot.
 
 ```shell
 istioctl replace -f manifests/route-rule-vote.yaml
@@ -254,6 +256,8 @@ Now each version of your vote microservice should receive half of the traffic. L
 
 Point your browser to:  
 `http://<IP:NodePort>` Replace with your own IP and NodePort.
+
+Now go to the vote section, you should see that half of the time the vote is empty since there's no data initialized in the database. You can start voting at the speaker or session section to see the vote microservice is reflecting your changes. (You browser may cache some of the JavaScript files, so it might take 10 to 20 seconds to start loading the actual changes.)
 
 > Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
@@ -273,7 +277,7 @@ Before we move on, we need to understand these different types of Circuit Breake
 - Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
 - Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `httpMaxPendingRequests` field.
 
-Now take a look at the circuit breaker rule for cloudant. We set the maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject all their requests for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
+Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject all their requests for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
 
 ```yaml
 type: destination-policy
@@ -317,13 +321,44 @@ Here's an example to demonstrate how can you create and test your fault toleranc
 
 ![fault tolerance](images/fault_tolerance.png)
 
-Let's apply a 1-second timeout on your Vote service.
+Now take a look at the **timeout-vote** file in manifests.
+```yaml
+type: route-rule
+name: timeout
+spec:
+  destination: vote-service.default.svc.cluster.local
+  httpReqTimeout:
+    simpleTimeout:
+      timeout: 1s
+  # httpReqRetries:
+  # simpleRetry:
+  #   attempts: 3
+  #   perTryTimeout: 1s
+```
+
+This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout. You also can apply retries rule by uncommenting the `httpReqRetries` section and delete/commenting out the `httpReqTimeout` section. Now, let's apply a 1-second timeout on your Vote service.
 
 ```shell
 istioctl create -f manifests/timeout-vote.yaml
 ```
 
-Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
+In order to test our fault tolerance rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
+```yaml
+type: route-rule
+name: cloudant-delay
+spec:
+  destination: cloudant-service.default.svc.cluster.local
+  precedence: 2
+  httpFault:
+    delay:
+      percent: 100
+      fixedDelay: 1.1s
+    # abort:
+    #   percent: 10
+    #   httpStatus: 503
+```
+
+This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Furthermore, you can uncomment the abort section to inject some abort errors. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
 
 ```shell
 istioctl create -f manifests/fault-injection.yaml
@@ -346,6 +381,8 @@ kubectl delete -f manifests
 
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)
+
+[Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)
 
 # License
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)

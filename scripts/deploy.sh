@@ -55,6 +55,7 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
+istioctl create -f manifests/route-rule-v1.yaml
 
 PODS=$(kubectl get pods | grep Init)
 while [ ${#PODS} -ne 0 ]

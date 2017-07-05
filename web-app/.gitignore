@@ -1,0 +1,4 @@
+src/main/static/node_modules/**
+src/main/static/typings/**
+target/**
+.kube/**

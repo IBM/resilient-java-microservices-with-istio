@@ -1,0 +1,12 @@
+type: route-rule
+name: vote-email
+spec:
+  destination: vote-service.default.svc.cluster.local
+  precedence: 2
+  match:
+    httpHeaders:
+      cookie:
+        regex: '^(.*?;)?email=[^;]*%40((ibm\.com)|(.*\.ibm\.com))(;.*)?$'
+  route:
+  - tags:
+      version: v2

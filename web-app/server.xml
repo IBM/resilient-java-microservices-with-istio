@@ -1,0 +1,19 @@
+<server description="web-application">
+
+    <!-- Enable features -->
+    <featureManager>
+      <feature>servlet-3.1</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+        host="*"
+        httpPort="9080"
+        httpsPort="9443" />
+
+    <webApplication name="web-app"
+        location="${server.config.dir}/apps/web-app.war"
+        contextRoot="/" />
+
+    <!-- Prevents warning messages about incorrect JSESSION id length -->
+    <httpSession cookieName="123456789abcdefghi12345"/>
+</server>

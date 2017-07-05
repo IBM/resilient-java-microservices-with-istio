@@ -1,0 +1,12 @@
+<project name="applySecurity" default="applySecurity" basedir=".">
+
+    <target name="applySecurity">
+        <copy file="target/static-resources/app/shared/request.service.secured.js"
+            tofile="target/static-resources/app/shared/request.service.js"
+            overwrite="true"/>
+        <copy file="target/static-resources/app/app.component.secured.js"
+            tofile="target/static-resources/app/app.component.js"
+            overwrite="true"/>
+    </target>
+
+</project>

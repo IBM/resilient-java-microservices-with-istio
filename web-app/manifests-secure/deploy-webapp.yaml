@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: microservice-webapp-sample
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: webapp-deployment
+    spec:
+      containers:
+      - name: microservice-webapp
+        image: web-application:latest
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: IfNotPresent
+#        readinessProbe:
+#          exec:
+#            command:
+#            - grep
+#            - CWWKF0011I
+#            - /logs/messages.log
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: 9080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: default
+spec:
+  ports:
+    - port: 9080
+  selector:
+    name: webapp-deployment

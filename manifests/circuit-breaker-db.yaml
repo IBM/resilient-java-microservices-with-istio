@@ -11,7 +11,5 @@ spec:
           sleepWindow: 15m
           httpDetectionInterval: 1s
           httpMaxEjectionPercent: 100
-          #httpMaxRequests: 1
-          #httpMaxRequestsPerConnection: 1
           
         

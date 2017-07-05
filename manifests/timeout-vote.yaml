@@ -5,4 +5,8 @@ spec:
   httpReqTimeout:
     simpleTimeout:
       timeout: 1s
+  # httpReqRetries:
+  # simpleRetry:
+  #   attempts: 3
+  #   perTryTimeout: 1s
       
