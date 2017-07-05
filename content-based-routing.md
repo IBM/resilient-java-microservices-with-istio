@@ -2,18 +2,24 @@
 
 ## Prerequisite
 - Make sure you go through step 1 and 2 in the main [README](README.md) before proceeding to the following steps.
-- You need to install Istio 0.2.X or built your own istio pilot with the commit that's beyond Jun 30, 2017(Not stable).
+- You need to install Istio 0.2.X or built your own [istio pilot](https://github.com/istio/pilot) with the commit that's beyond Jun 30, 2017(Not stable).
+
+## Instructions
 
 Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic based on their login information. First, we need to build our custom webapp image that has login function. So, run 
 
-```shell
+```
 cd web-app
 mvn clean package
 cd ..
 docker build -t registry.ng.bluemix.net/<namespace>/webapp web-app
 docker push registry.ng.bluemix.net/<namespace>/webapp
-sed -i '' s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml #For Mac user
-sed -i s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml #For Linux user
+
+#For Mac user
+sed -i '' s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml 
+
+#For Linux user
+sed -i s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml
 ```
 
 Now, delete our previous deployment and deploy our new webapp.

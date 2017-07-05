@@ -222,7 +222,7 @@ Congratulation, you MicroProfile application is running and it should look like 
 
 > Note: Currently the route matching rule is not working within Istio ingress network because there's a bug in Istio 0.1.6. For now, we will show you how to use route-rule to split the traffic for each version. Content-based routing is simply adding matching rule for your content on top of your traffic rule.
 >
-> You can follow this [instruction](content-based-routing.md) to create a content-based routing once you have Istio 0.2.X or built your own istio pilot with the commit that's beyond Jun 30, 2017(Not stable).
+> You can follow this [instruction](content-based-routing.md) to create a content-based routing once you have Istio 0.2.X or built your own [istio pilot](https://github.com/istio/pilot) with the commit that's beyond Jun 30, 2017(Not stable).
 
 Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
 
@@ -382,7 +382,7 @@ kubectl delete -f manifests
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)
 
-[Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)
+This Java MicroProfile codebase is based on WebSphere Liberty's [Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)
 
 # License
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
