@@ -21,7 +21,7 @@ In this code we demonstrate how to build, deploy, connect, manage and monitor Ja
 
 In this code we will show how to configure and use Circuit Breakers, Fault Inection and Retries/Timeouts resiliency features for your Java Microservices application.
 
-![MicroProfile-Istio](images/microProfile-istio.png)
+![MicroProfile-Istio](images/microprofile-istio.png)
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
