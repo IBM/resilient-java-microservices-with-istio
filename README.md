@@ -54,7 +54,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
 4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Add resiliency feature - Timeouts and Retries](#-5-add-resiliency-feature---timeouts-and-retries)
+5. [Add resiliency feature - Timeouts and Retries](#5-add-resiliency-feature---timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
