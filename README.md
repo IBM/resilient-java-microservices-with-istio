@@ -24,13 +24,10 @@ In this code we will show how to configure and use Circuit Breakers, Fault Inect
 ![MicroProfile-Istio](images/MicroProfile-Istio.png)
 
 ## Included Components
+- [MicroProfile](https://microprofile.io)
 - [Istio](https://istio.io/)
 - [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
-- [Grafana](http://docs.grafana.org/guides/getting_started)
-- [Zipkin](http://zipkin.io/)
-- [Prometheus](https://prometheus.io/)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
-- [Bluemix container service](https://console.ng.bluemix.net/catalog/?taxonomyNavigation=apps&category=containers)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 
 # Prerequisite
@@ -56,8 +53,8 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
-4. [Add resiliency Feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Create fault injection to test your fault tolerance](#5-create-fault-injection-to-test-your-fault-tolerance)
+4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
+5. [Add resiliency feature - Timeouts and Retries](#-5-add-resiliency-feature-timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -308,16 +305,11 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-## 5. Create fault injection to test your fault tolerance
+## 5. Add resiliency Feature - Timeouts and Retries
 
-Before we move on, we need to understand the idea of fault tolerance and fault injection.
+Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
-- Fault Tolerance: Features that keep your application continue operating properly in the event of the failure. Some of the common features are timeouts and retries.
-- Fault Injection: Introducing faults to test our application.
-
-In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. 
-
-Here's an example to demonstrate how can you create and test your fault tolerance. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. Then, in order to make sure we can trigger the fault tolerance, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant.
+Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injetion.
 
 ![fault tolerance](images/fault_tolerance.png)
 
@@ -342,7 +334,7 @@ This rule will timeout all the responses that take more than 1 second in the vot
 istioctl create -f manifests/timeout-vote.yaml
 ```
 
-In order to test our fault tolerance rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
+In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
 ```yaml
 type: route-rule
 name: cloudant-delay
