@@ -82,4 +82,5 @@ then
     exit 1
 fi
 kubectl get pods,svc
-echo "You can now view your Sample Java MicroProfile App http://$GATEWAY_URL"
+echo "You can now view your Sample Java MicroProfile App at http://$GATEWAY_URL"
+echo "Note: It will take up to 5 minutes for the app to be fully functioning."
