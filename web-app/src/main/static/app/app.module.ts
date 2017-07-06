@@ -1,5 +1,5 @@
-import
-{NgModule} from "@angular/core";
+import {NgModule} from "@angular/core";
+import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule} from "@angular/forms";
 import {HttpModule, JsonpModule } from "@angular/http";
@@ -63,7 +63,9 @@ import { CookieService } from 'angular2-cookie/services/cookies.service';
         SessionService,
         ScheduleService,
         VoteService,
-        CookieService
+        CookieService,
+        Location,
+        {provide: LocationStrategy, useClass: HashLocationStrategy}
     ],
     bootstrap: [
         AppComponent

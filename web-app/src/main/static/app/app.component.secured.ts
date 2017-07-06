@@ -8,7 +8,7 @@ enableProdMode();
     templateUrl: 'app/app.component.html'
 })
 
-export class AppComponent{
+export class AppComponent {
     title = 'Microprofile Conference';
 
     constructor(private jwtService: JwtService) {

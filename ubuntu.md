@@ -34,7 +34,6 @@ Now after you have all the CLIs, clone the repository.
 ```shell
 git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
 cd sample.microservicebuilder.vote
-git checkout 1ec02ee9915529391a8a6d0a21481185a59b4e14
 ```
 
 Build your application using Maven.
@@ -46,13 +45,10 @@ To build your own docker image, you have to connect your docker server to IBM co
 
 ```shell
 bx login -a https://api.ng.bluemix.net
-bx ic init #you should see instructions on exporting your DOCKER_HOST, DOCKER_CERT_PATH, and DOCKER_TLS_VERIFY
-export DOCKER_HOST= #fill in your DOCKER_HOST
-export DOCKER_CERT_PATH= #fill in your DOCKER_CERT_PATH
-export DOCKER_TLS_VERIFY= #fill in your DOCKER_TLS_VERIFY
+bx ic init
 bx ic build -t microservice-vote-cloudant .
 ```
 
 Now **exit** your ubuntu and modify *manifests/deploy-vote.yaml*. Change `docker.io/tomcli/microservice-vote-cloudant` to `registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant` (replace `<namespace>` with your namespace).
 
-Your image should be built on your Bluemix container registry. Now you can move on to [step 3](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#3-inject-istio-envoys-on-java-microprofile-application).
+Your image should be built on your Bluemix container registry. Now you can move on to [step 3](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#3-create-a-content-based-routing-for-your-microservices).
