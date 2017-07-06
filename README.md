@@ -308,16 +308,12 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-## 5. Create fault injection to test your fault tolerance
+## 5. Add resiliency Feature - Timeouts and Retries
 
-Before we move on, we need to understand the idea of fault tolerance and fault injection.
+Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
-- Fault Tolerance: Features that keep your application continue operating properly in the event of the failure. Some of the common features are timeouts and retries.
-- Fault Injection: Introducing faults to test our application.
+Then, in order to make sure we can trigger the this ,we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injetion.
 
-In many cases, you want to create fault tolerances to keep your application running even with some of your components is failed. Furthermore, you want to inject some failures in order to test the fault tolerances are working properly. Istio can let you do both fault tolerance and fault tolerance without changing any of your code. 
-
-Here's an example to demonstrate how can you create and test your fault tolerance. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. Then, in order to make sure we can trigger the fault tolerance, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant.
 
 ![fault tolerance](images/fault_tolerance.png)
 
