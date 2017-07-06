@@ -21,7 +21,7 @@ In this code we demonstrate how to build, deploy, connect, manage and monitor Ja
 
 In this code we will show how to configure and use Circuit Breakers, Fault Inection and Retries/Timeouts resiliency features for your Java Microservices application.
 
-![MicroProfile-Istio](images/MicroProfile-Istio.png)
+![MicroProfile-Istio](images/microProfile-istio.png)
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
@@ -54,7 +54,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
 4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Add resiliency feature - Timeouts and Retries](#-5-add-resiliency-feature-timeouts-and-retries)
+5. [Add resiliency feature - Timeouts and Retries](#-5-add-resiliency-feature---timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -258,7 +258,7 @@ Now go to the vote section, you should see that half of the time the vote is emp
 
 > Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
 
-## 4. Add resiliency Feature - Circuit Breakers
+## 4. Add resiliency feature - Circuit Breakers
 
 Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
 
@@ -305,7 +305,7 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-## 5. Add resiliency Feature - Timeouts and Retries
+## 5. Add resiliency feature - Timeouts and Retries
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
