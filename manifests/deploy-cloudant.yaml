@@ -76,6 +76,7 @@ spec:
     metadata:
       labels:
         name: cloudant-deployment
+        version: v1
     spec:
       containers:
       - name: cloudant-db

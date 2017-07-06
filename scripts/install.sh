@@ -27,7 +27,12 @@ bx cs workers $CLUSTER
 $(bx cs cluster-config $CLUSTER | grep export)
 
 #Delete previous deployment and change image names.
-kubectl delete --ignore-not-found=true -f manifests/
+kubectl delete --ignore-not-found=true -f manifests/deploy-schedule.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-session.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-speaker.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-vote.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-webapp.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-cloudant.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
@@ -84,6 +89,7 @@ echo "MicroProfile done."
 function health_check() {
 
 export GATEWAY_URL=$(kubectl get po -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+sleep 60s #wait for Websphere Liberty to be up
 HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL)
 if [ $HEALTH -eq 200 ]
 then
