@@ -24,13 +24,10 @@ In this code we will show how to configure and use Circuit Breakers, Fault Inect
 ![MicroProfile-Istio](images/MicroProfile-Istio.png)
 
 ## Included Components
+- [MicroProfile](https://microprofile.io)
 - [Istio](https://istio.io/)
 - [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
-- [Grafana](http://docs.grafana.org/guides/getting_started)
-- [Zipkin](http://zipkin.io/)
-- [Prometheus](https://prometheus.io/)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
-- [Bluemix container service](https://console.ng.bluemix.net/catalog/?taxonomyNavigation=apps&category=containers)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 
 # Prerequisite
@@ -56,8 +53,8 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
-4. [Add resiliency Feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Add resiliency Feature - Timeouts and Retries](#-5-add-resiliency-feature-timeouts-and-retries)
+4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
+5. [Add resiliency feature - Timeouts and Retries](#-5-add-resiliency-feature-timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
