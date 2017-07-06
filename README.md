@@ -57,7 +57,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
 4. [Add resiliency Feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Create fault injection to test your fault tolerance](#5-create-fault-injection-to-test-your-fault-tolerance)
+5. [Add resiliency Feature - Timeouts and Retries](#-5-add-resiliency-feature-timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -312,8 +312,7 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
-Then, in order to make sure we can trigger the this ,we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injetion.
-
+Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injetion.
 
 ![fault tolerance](images/fault_tolerance.png)
 
@@ -338,7 +337,7 @@ This rule will timeout all the responses that take more than 1 second in the vot
 istioctl create -f manifests/timeout-vote.yaml
 ```
 
-In order to test our fault tolerance rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
+In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
 ```yaml
 type: route-rule
 name: cloudant-delay
