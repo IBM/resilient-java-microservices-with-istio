@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-ISTIO.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
+[![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
 
 # Enable your Java MicroProfile microservices with advanced resiliency and traffic management features leveraging Istio 
 
