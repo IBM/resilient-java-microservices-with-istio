@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-ISTIO.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
 
-# Enable your Java MicroProfile Microservices with advanced resiliency and traffic management features leveraging Istio 
+# Enable your Java MicroProfile microservices with advanced resiliency and traffic management features leveraging Istio 
 
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
 
