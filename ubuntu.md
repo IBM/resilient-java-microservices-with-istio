@@ -1,7 +1,7 @@
 # Build Your Vote Microservice Version 2
 
 ## Prerequisite
-We assume you are at the end of [step 2](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#2-get-and-build-the-application-code) for our Java MicroProfile Microservices on Istio example.
+We assume you are at the end of [step 1](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#1-get-and-build-the-application-code) for our Java MicroProfile Microservices on Istio example.
 
 ## Build your Vote Microservice Version 2 on Ubuntu/Linux
 
@@ -51,4 +51,4 @@ bx ic build -t microservice-vote-cloudant .
 
 Now **exit** your ubuntu and modify *manifests/deploy-vote.yaml*. Change `docker.io/tomcli/microservice-vote-cloudant` to `registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant` (replace `<namespace>` with your namespace).
 
-Your image should be built on your Bluemix container registry. Now you can move on to [step 3](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#3-create-a-content-based-routing-for-your-microservices).
+Your image should be built on your Bluemix container registry. Now you can move on to [step 2](https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio#2-deploy-application-microservices-and-istio-envoys).

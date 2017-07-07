@@ -1,24 +1,3 @@
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: cloudant-secret-generator-deploy
-  labels:
-    app: microprofile-app
-spec:
-  template:
-    metadata:
-      name: cloudant-secret-generator-deploy
-    spec:
-      containers:
-      - name: cloudant-secret-generator-deploy
-        image: ibmcom/kubernetes:v1.5.2
-        command: ["/bin/sh","-c"]
-        args: ["/kubectl get secret cloudant-secret || /kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --from-literal=dbPassword=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;`"]
-        resources:
-          limits:
-            cpu: 100m
-      restartPolicy: Never
----
 kind: PersistentVolume
 apiVersion: v1
 metadata:

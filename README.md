@@ -73,7 +73,7 @@ cd Java-MicroProfile-Microservices-on-Istio
 Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
 
 ```shell
-bx plugin install container-registry -r Bluemix
+bx plugin install container-registry -r Bluemix #Replace 'install' to 'update' if you have an older version of container-registry
 bx cr namespaces #If there's a namespace in your account, then you don't need to create a new one.
 bx cr namespace-add <namespace> #replace <namespace> with any name.
 ```
@@ -83,7 +83,7 @@ bx cr namespace-add <namespace> #replace <namespace> with any name.
 > bash scripts/get_code_linux.sh #For Linux users
 > bash scripts/get_code_osx.sh #For Mac users
 > ```
->Then, you can move on to [Step 3](#3-inject-istio-envoys-on-java-microprofile-application).
+>Then, you can move on to [Step 2](#2-deploy-application-microservices-and-istio-envoys).
 
   `git clone` the following projects:
    * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
@@ -162,6 +162,7 @@ Before you proceed to the following steps, change the `<namespace>` in your yaml
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```shell
+kubectl apply -f manifests/deploy-job.yaml #Create a secret for cloudant credential
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
@@ -175,7 +176,6 @@ After a few minutes, you should now have your Kubernetes Pods running and have a
 $ kubectl get pods
 NAME                                           READY     STATUS      RESTARTS   AGE
 cloudant-db-4102896723-6ztmw                   2/2       Running     0          1h
-cloudant-secret-generator-deploy-lwmrs         1/2       Completed   0          4h
 istio-egress-3946387492-5wtbm                  1/1       Running     0          2d
 istio-ingress-4179457893-clzjf                 1/1       Running     0          2d
 istio-mixer-2598054512-bm3st                   1/1       Running     0          2d
@@ -209,7 +209,7 @@ echo $(kubectl get pod -l istio=ingress -o jsonpath={.items[0].status.hostIP}):$
 Point your browser to:  
 `http://<IP:NodePort>` Replace with your own IP and NodePort.
 
-Congratulation, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
+Congratulations, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
 
 
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
@@ -368,6 +368,11 @@ kubectl delete -f install/kubernetes/istio.yaml
 * To delete your microprofile application, run the following commands in this Github repo's main directory
 ```shell
 kubectl delete -f manifests
+```
+
+* To delete your route rule or destination policy, run the following commands in this Github repo's main directory
+```shell
+istioctl delete -f manifests/<filename>.yaml #Replace <filename> with the rule/policy file name you want to delete.
 ```
 
 # References
