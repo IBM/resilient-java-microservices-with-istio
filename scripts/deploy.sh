@@ -21,6 +21,8 @@ kubectl delete --ignore-not-found=true -f manifests/deploy-speaker.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-vote.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-webapp.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-cloudant.yaml
+kubectl delete --ignore-not-found=true -f manifests/deploy-job.yaml
+kubectl delete --ignore-not-found=true -f manifests/ingress.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
@@ -54,6 +56,7 @@ echo "Finished Istio Control Plane setup."
 echo "Creating Java MicroProfile with Injected Envoys..."
 cd ..
 kubectl create -f manifests/ingress.yaml
+kubectl apply -f manifests/deploy-job.yaml
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
