@@ -21,6 +21,7 @@ kubectl delete --ignore-not-found=true -f manifests/deploy-speaker.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-vote.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-webapp.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-cloudant.yaml
+kubectl delete --ignore-not-found=true -f manifests/ingress.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
 sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
