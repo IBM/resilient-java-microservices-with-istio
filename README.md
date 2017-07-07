@@ -2,12 +2,11 @@
 
 # Enable your Java MicroProfile Microservices with advanced resiliency and traffic management features leveraging Istio 
 
-
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
 
-Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy and scale them? Moving forward, how do we collect metrics about traffic behavior, which can be used to enforce policy decisions such as fine-grained access control and rate limits? Enter service mesh and Istio, which allows us to connect, manage, and secure microservices, and enable deeper insights into the microservices metrics. Istio provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars, an extended version of the  [Envoy](https://lyft.github.io/envoy/) proxy, in the same Pod as your microservice.
+Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy, secure and make them resilient? How do we enforce policy decisions such as fine-grained access control and rate limits? A service-mesh architecure attempsts to solve these issues. Istio provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars, an extended version of the  [Envoy](https://lyft.github.io/envoy/) proxy, in the same Pod as your microservice.
 
-In this code we demonstrate how to build, deploy, connect, manage and monitor Java MicroProfile microservices leveraging Istio service mesh. Once this is done, specific features from Istio we dive in are.  
+In this code we demonstrate how to build, deploy, connect, and test canary deployments for your Java MicroProfile microservices leveraging Istio service mesh. We then show how to configure and use Circuit Breakers, Fault Inection and Retries/Timeouts resiliency features for the application.
 
 **Canary deployments**: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
 
@@ -19,7 +18,7 @@ In this code we demonstrate how to build, deploy, connect, manage and monitor Ja
  - Control connection pool size and request load
  - Systematic fault injection
 
-In this code we will show how to configure and use Circuit Breakers, Fault Inection and Retries/Timeouts resiliency features for your Java Microservices application.
+We use a sample  web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on WebSphere Liberty, in Docker containers managed by Kubernetes.
 
 ![MicroProfile-Istio](images/microprofile-istio.png)
 
