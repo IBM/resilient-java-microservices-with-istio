@@ -22,6 +22,8 @@ sed -i '' s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml
 sed -i s#"microservice-webapp"#webapp# manifests/deploy-webapp.yaml
 ```
 
+> You can visit [here](webapp_compare.md) to see what is modified in our custom webapp.
+
 Now, delete our previous deployment and deploy our new webapp.
 ```shell
 kubectl delete -f manifests/deploy-webapp.yaml
