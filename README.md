@@ -1,14 +1,12 @@
 [![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
 
-# Enable your Java MicroProfile microservices with advanced resiliency and traffic management features leveraging Istio 
+# Enable your Java MicroProfile microservices with advanced resiliency features leveraging Istio 
 
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
 
 Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy, secure and make them resilient? How do we enforce policy decisions such as fine-grained access control and rate limits? Service-mesh architecture attempts to solve these issues. Istio, joint collaboration between IBM, Google and Lyft, provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
 
 In this code we demonstrate how to build, deploy, connect, and test canary deployments for your Java MicroProfile microservices leveraging Istio service mesh. We then show how to configure and use circuit breakers and timeouts/retries resiliency features for the application.
-
-**Canary deployments**: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
 
 **Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some of resiliency features it supports are: 
 
@@ -17,8 +15,10 @@ In this code we demonstrate how to build, deploy, connect, and test canary deplo
  - Health checks
  - Control connection pool size and request load
  - Systematic fault injection
+ 
+ **Canary deployments**: In most cases, when components are upgraded it’s useful to deploy the new version but only have a small subset of network traffic routed to it so that it can be tested before the old version is removed. This is often referred to as “canary testing”.
 
-We use a sample web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on WebSphere Liberty, in Docker containers managed by Kubernetes.
+We use the sample MicroProfile web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on WebSphere Liberty, in Docker containers managed by Kubernetes.
 
 ![MicroProfile-Istio](images/microprofile-istio.png)
 
