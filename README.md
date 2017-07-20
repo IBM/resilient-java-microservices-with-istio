@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
+[![Build Status](https://travis-ci.org/IBM/resilient-java-microservices-with-istio.svg?branch=master)](https://travis-ci.org/IBM/resilient-java-microservices-with-istio)
 
 # Enable your Java MicroProfile microservices with advanced resiliency features leveraging Istio 
 
@@ -66,8 +66,8 @@ Before you proceed to the following instructions, make sure you have [Maven](htt
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
 ```shell
-git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio.git 
-cd Java-MicroProfile-Microservices-on-Istio
+git clone https://github.com/IBM/resilient-java-microservices-with-istio.git 
+cd resilient-java-microservices-with-istio
 ```
 
 Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
@@ -102,13 +102,17 @@ bx cr namespace-add <namespace> #replace <namespace> with any name.
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.session.git
   ```
-   * [Vote Version 1](https://github.com/WASdev/sample.microservicebuilder.vote) 
+   * [Vote Version 1](https://github.com/WASdev/sample.microservicebuilder.vote/tree/4bd11a9bcdc7f445d7596141a034104938e08b22) 
+   ```shell
+      git clone https://github.com/WASdev/sample.microservicebuilder.vote.git vote-v1
+      cd vote-v1
+      git checkout 4bd11a9bcdc7f445d7596141a034104938e08b22
+      cd ..
+  ```
+   * [Vote Version 2](https://github.com/WASdev/sample.microservicebuilder.vote) 
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
-      cd sample.microservicebuilder.vote/
-      git checkout 4bd11a9bcdc7f445d7596141a034104938e08b22
   ```
-
 * `mvn clean package` in each ../sample.microservicebuilder.* projects
 
 Now, use the following commands to build the microservice containers.
@@ -145,15 +149,21 @@ docker build -t registry.ng.bluemix.net/<namespace>/microservice-session .
 docker push registry.ng.bluemix.net/<namespace>/microservice-session
 ```
 
-Build the vote microservice container
+Build the vote version 1 microservice container
 
 ```shell
-cd sample.microservicebuilder.vote
+cd vote-v1
 docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
 docker push registry.ng.bluemix.net/<namespace>/microservice-vote
 ```
 
-> For this example, we will provide you the *version 2 vote image* because it can only be built with Linux environment. If you want to build your own version 2 vote image, please follow [this instruction](ubuntu.md) on how to build it on Docker Ubuntu.
+Build the vote version 2 microservice container
+
+```shell
+cd sample.microservicebuilder.vote
+docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant .
+docker push registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant
+```
 
 ## 2. Deploy application microservices and Istio envoys
 
@@ -373,6 +383,12 @@ kubectl delete -f manifests
 * To delete your route rule or destination policy, run the following commands in this Github repo's main directory
 ```shell
 istioctl delete -f manifests/<filename>.yaml #Replace <filename> with the rule/policy file name you want to delete.
+```
+
+* If you have trouble with the maven build, your maven might have some dependency conflicts. Therefore, you need to purge your dependencies and rebuild your application by running the following commands
+```shell
+mvn dependency:purge-local-repository
+mvn clean package
 ```
 
 # References

@@ -40,7 +40,7 @@ spec:
       containers:
       - name: microservice-vote
         #change this image name if you build your images on Linux
-        image: tomcli/microservice-vote-cloudant
+        image: registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant
         imagePullPolicy: Always
         env:
         - name: dbUsername
