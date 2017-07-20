@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio.svg?branch=master)](https://travis-ci.org/IBM/Java-MicroProfile-Microservices-on-Istio)
+[![Build Status](https://travis-ci.org/IBM/resilient-java-microservices-with-istio.svg?branch=master)](https://travis-ci.org/IBM/resilient-java-microservices-with-istio)
 
 # Enable your Java MicroProfile microservices with advanced resiliency and traffic management features leveraging Istio 
 
@@ -66,8 +66,8 @@ Before you proceed to the following instructions, make sure you have [Maven](htt
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
 ```shell
-git clone https://github.com/IBM/Java-MicroProfile-Microservices-on-Istio.git 
-cd Java-MicroProfile-Microservices-on-Istio
+git clone https://github.com/IBM/resilient-java-microservices-with-istio.git 
+cd resilient-java-microservices-with-istio
 ```
 
 Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
@@ -385,9 +385,10 @@ kubectl delete -f manifests
 istioctl delete -f manifests/<filename>.yaml #Replace <filename> with the rule/policy file name you want to delete.
 ```
 
-* If you have trouble with the maven build, your maven might have some dependency conflicts. Therefore, you need to purge your dependencies by running the following commands 
+* If you have trouble with the maven build, your maven might have some dependency conflicts. Therefore, you need to purge your dependencies and rebuild your application by running the following commands
 ```shell
-mvn clean package dependency:purge-local-repository
+mvn dependency:purge-local-repository
+mvn clean package
 ```
 
 # References
