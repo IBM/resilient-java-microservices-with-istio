@@ -4,7 +4,7 @@
 
 [MicroProfile](http://microprofile.io) is a baseline platform definition that optimizes Enterprise Java for a microservices architecture and delivers application portability across multiple MicroProfile runtimes. It delivers application portability across multiple MicroProfile runtimes; the initial baseline is JAX-RS plus CDI plus JSON-P.
 
-Building and packaging these Java microservice is one part of the story. How do we connect, manage, deploy, secure and make them resilient? How do we enforce policy decisions such as fine-grained access control and rate limits? Service-mesh architecture attempts to solve these issues. Istio, joint collaboration between IBM, Google and Lyft, provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
+Building and packaging these Java microservice is one part of the story. How do we cmake them resilient? How do we introduce health checks, circuit-breakers, timeouts, retries? Service-mesh architecture attempts to solve these issues. Istio, joint collaboration between IBM, Google and Lyft, provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
 
 In this code we demonstrate how to build, deploy, connect, and test canary deployments for your Java MicroProfile microservices leveraging Istio service mesh. We then show how to configure and use circuit breakers and timeouts/retries resiliency features for the application.
 
