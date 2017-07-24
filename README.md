@@ -51,7 +51,7 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
 
-3. [Create a content-based routing for your microservices](#3-create-a-content-based-routing-for-your-microservices)
+3. [Create a traffic flow rule for your microservices](#3-create-a-traffic-flow-rule-for-your-microservices)
 4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
 5. [Add resiliency feature - Timeouts and Retries](#5-add-resiliency-feature---timeouts-and-retries)
 
@@ -224,13 +224,11 @@ Congratulations, you MicroProfile application is running and it should look like
 
 ## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
 
-## 3. Create a content-based routing for your microservices
+## 3. Create a traffic flow rule for your microservices
 
-> Note: Currently the route matching rule is not working within Istio ingress network because there's a bug in Istio 0.1.6. For now, we will show you how to use route-rule to split the traffic for each version. Content-based routing is simply adding matching rule for your content on top of your traffic rule.
->
-> You can follow this [instruction](content-based-routing.md) to create a content-based routing once you have Istio 0.2.X or built your own [istio pilot](https://github.com/istio/pilot) with the commit that's beyond Jun 30, 2017(Not stable).
+Istio can dynamically modify the network traffic between some of the components of our application. You can configure all or a certain percentage of the traffic to flow to one version. This feature is very convenient when it comes to A/B Testing and Canary deployments. 
 
-Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
+From the previous step, you used the Istio route rule to modify the network traffic to version 1 vote. Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
 
 ```yaml
 type: route-rule
