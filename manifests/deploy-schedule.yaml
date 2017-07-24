@@ -29,5 +29,7 @@ metadata:
 spec:
   ports:
     - port: 9080
+      targetPort: 9080
+      name: http
   selector:
     name: schedule-deployment
