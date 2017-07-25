@@ -1,12 +1,12 @@
 # Modification of the yaml files for MicroProfile example.
 
-For this Istio example, we modified the following yaml files in the MicroProfile example. All the new yaml files are in [this](manifests) manifests folder. You can click on each file to view the detailed changes.
+For this Istio example, we modified the following yaml files in the MicroProfile example. All the new yaml files are in [this](manifests) manifests folder. You can click on each following file to view the detailed changes.
 
-- [*deploy-webapp.yaml*](images/code_1.png)
-- [*deploy-schedule.yaml*](images/code_2.png)
-- [*deploy-speaker.yaml*](images/code_3.png)
-- [*deploy-session.yaml*](images/code_4.png)
-- [*deploy-vote.yaml*](images/code_5.png) -> *deploy-job.yaml*, *deploy-cloudant.yaml*, and *deploy-vote.yaml*
+- [*deploy-webapp.yaml*](images/webapp_diff.png)
+- [*deploy-schedule.yaml*](images/schedule_diff.png)
+- [*deploy-speaker.yaml*](images/speaker_diff.png)
+- [*deploy-session.yaml*](images/session_diff.png)
+- [*deploy-vote.yaml*](images/vote_diff.png)
 
 Since the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes), we need to remove all the Microservice Builder dependencies (readinessProbe, livenessProbe, env, volumeMounts, and volumes) from the original yaml files in order to deploy the application without any infrastructure services and on Istio. 
 
@@ -16,4 +16,4 @@ Moreover, we break down the *deploy-vote.yaml* in the vote microservice to *depl
 
 Lastly, since we will use the Istio ingress for our endpoints, we created the `ingress.yaml` to replace all the xxx-ingress.yaml file in each microservice.
 
-> Note: All the other yaml files in the manifests folder are for Istio route rule and destination policy.
+> Note: All the other yaml files in this manifests folder are for Istio route rule and destination policy.
