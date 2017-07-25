@@ -12,7 +12,7 @@ Since the original MicroProfile example is built on top of the Fabric (an extra 
 
 In addition, we added some lables and changed the image names, so users can use their own images and manage all the deployments using the app tag. We also added the target port so the service discovery can do less work and deploy the application much faster. 
 
-Moreover, we break down the *deploy-vote.yaml* in the vote microservice to *deploy-job.yaml*, *deploy-cloudant.yaml*, and *deploy-vote.yaml* since the original *deploy-vote.yaml* puts everything into one yaml file and we want to inject the sidecar differently for the cloudant microservice. Also, since we have 2 version of vote microservice, we added an extra deployment v2 in *deploy-vote.yaml*.
+Moreover, within the original *deploy-vote.yaml*, there are secret creation job, cloudant deployment, and vote deployment. The secret creation job doesn't need to have an Envoy sidecar, and the cloudant database needs to access some external network. Thus, we break down the *deploy-vote.yaml* in the vote microservice to *deploy-job.yaml*, *deploy-cloudant.yaml*, and *deploy-vote.yaml* in order to inject the Envoy sidecars differently. Also, since we have 2 version of vote microservice, we added an extra deployment v2 in *deploy-vote.yaml*.
 
 Lastly, since we will use the Istio ingress for our endpoints, we created the `ingress.yaml` to replace all the xxx-ingress.yaml file in each microservice.
 
