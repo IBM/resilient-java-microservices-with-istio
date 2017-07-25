@@ -267,7 +267,7 @@ Now go to the vote section, you should see that half of the time the vote is emp
 
 Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
 
-Now we will show you how to enable circuit breaker for the sample Java microservice application when your Database is broken. 
+Now we will show you how to enable circuit breaker for the sample Java microservice application based on maximum connections your database can handle.. 
 
 In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
 
