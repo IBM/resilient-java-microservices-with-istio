@@ -27,7 +27,6 @@ metadata:
   name: session-service
   labels:
     app: microprofile-app
-  namespace: default
 spec:
   ports:
     - port: 9080

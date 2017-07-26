@@ -153,6 +153,8 @@ docker push <docker_username>/microservice-vote-cloudant
 
 ## 2. Deploy application microservices and Istio envoys
 
+
+The great thing about Istio is you can deploy you application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository
 Before you proceed to the following steps, change the `<docker_username>` in your yaml files to your own docker username.
 >Note: If you ran the **get_code** script, your docker username is already changed in your yaml files.
 
@@ -184,7 +186,7 @@ microservice-vote-sample-v2-3728755778-5c4vx   2/2       Running     0          
 microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d   
 ```
 
-To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, we will run
+To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, do:
 
 ```shell
 kubectl create -f manifests/ingress.yaml
@@ -316,9 +318,9 @@ spec:
     simpleTimeout:
       timeout: 1s
   # httpReqRetries:
-  # simpleRetry:
-  #   attempts: 3
-  #   perTryTimeout: 1s
+  #   simpleRetry:
+  #     attempts: 3
+  #     perTryTimeout: 1s
 ```
 
 This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout. You also can apply retries rule by uncommenting the `httpReqRetries` section and delete/commenting out the `httpReqTimeout` section. Now, let's apply a 1-second timeout on your Vote service.
