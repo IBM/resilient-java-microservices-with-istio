@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
       - name: microservice-vote
-        #change this image name if you build your images on Linux
+        #change this image name 
         image: registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant
         imagePullPolicy: Always
         env:
@@ -69,7 +69,6 @@ metadata:
   name: vote-service
   labels:
     app: microprofile-app
-  namespace: default
 spec:
   ports:
     - port: 9080
