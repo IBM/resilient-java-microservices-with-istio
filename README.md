@@ -68,22 +68,16 @@ git clone https://github.com/IBM/resilient-java-microservices-with-istio.git
 cd resilient-java-microservices-with-istio
 ```
 
-Then, install the container registry plugin for Bluemix CLI and create a namespace to store your images.
-
-```shell
-bx plugin install container-registry -r Bluemix #Replace 'install' to 'update' if you have an older version of container-registry
-bx cr namespaces #If there's a namespace in your account, then you don't need to create a new one.
-bx cr namespace-add <namespace> #replace <namespace> with any name.
-```
+Now, make sure you login to Docker first before you proceed to the following step.
 
 > **Note:** For the following steps, you can get the code and build the package by running 
 > ```shell
-> bash scripts/get_code_linux.sh #For Linux users
-> bash scripts/get_code_osx.sh #For Mac users
+> ./scripts/get_code_linux.sh [docker username] #For Linux users
+> ./scripts/get_code_osx.sh [docker username] #For Mac users
 > ```
 >Then, you can move on to [Step 2](#2-deploy-application-microservices-and-istio-envoys).
 
-  `git clone` the following projects:
+  `git clone` and `mvn clean package` the following projects:
    * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git
@@ -118,55 +112,49 @@ Now, use the following commands to build the microservice containers.
 Build the web-app microservice container
 
 ```shell
-cd sample.microservicebuilder.web-app
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-webapp .
-docker push registry.ng.bluemix.net/<namespace>/microservice-webapp
+docker build -t <docker_username>/microservice-webapp sample.microservicebuilder.web-app
+docker push <docker_username>/microservice-webapp
 ```
 
 Build the schedule microservice container
 
 ```shell
-cd sample.microservicebuilder.schedule
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-schedule .
-docker push registry.ng.bluemix.net/<namespace>/microservice-schedule
+docker build -t <docker_username>/microservice-schedule sample.microservicebuilder.schedule
+docker push <docker_username>/microservice-schedule
 ```
 
 Build the speaker microservice container
 
 ```shell
-cd sample.microservicebuilder.speaker
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-speaker .
-docker push registry.ng.bluemix.net/<namespace>/microservice-speaker
+docker build -t <docker_username>/microservice-speaker sample.microservicebuilder.speaker
+docker push <docker_username>/microservice-speaker
 ```
 
 Build the session microservice container
 
 ```shell
-cd sample.microservicebuilder.session
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-session .
-docker push registry.ng.bluemix.net/<namespace>/microservice-session
+docker build -t <docker_username>/microservice-session sample.microservicebuilder.session
+docker push <docker_username>/microservice-session
 ```
 
 Build the vote version 1 microservice container
 
 ```shell
-cd vote-v1
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote .
-docker push registry.ng.bluemix.net/<namespace>/microservice-vote
+docker build -t <docker_username>/microservice-vote vote-v1
+docker push <docker_username>/microservice-vote
 ```
 
 Build the vote version 2 microservice container
 
 ```shell
-cd sample.microservicebuilder.vote
-docker build -t registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant .
-docker push registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant
+docker build -t <docker_username>/microservice-vote-cloudant sample.microservicebuilder.vote
+docker push <docker_username>/microservice-vote-cloudant
 ```
 
 ## 2. Deploy application microservices and Istio envoys
 
-Before you proceed to the following steps, change the `<namespace>` in your yaml files to your own namespace.
->Note: If you ran the **get_code** script, your namespace is already changed.
+Before you proceed to the following steps, change the `<docker_username>` in your yaml files to your own docker username.
+>Note: If you ran the **get_code** script, your docker username is already changed in your yaml files.
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
 ```shell

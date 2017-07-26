@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-schedule
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-schedule
+        image: <docker_username>/microservice-schedule
         ports:
           - containerPort: 9080
 ---
