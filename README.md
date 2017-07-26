@@ -154,7 +154,8 @@ docker push <docker_username>/microservice-vote-cloudant
 ## 2. Deploy application microservices and Istio envoys
 
 
-The great thing about Istio is you can deploy you application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository
+The great thing about Istio is you can deploy you application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository.
+
 Before you proceed to the following steps, change the `<docker_username>` in your yaml files to your own docker username.
 >Note: If you ran the **get_code** script, your docker username is already changed in your yaml files.
 
