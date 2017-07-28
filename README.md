@@ -333,7 +333,7 @@ You can double check the broken cloudant only received the traffic once.
 kubectl get pods # check your cloudant-db2 name
 kubectl logs cloudant-db2-xxxxxxx-xxxxx proxy --tail=150 # You can replace 150 with the number of logs you like to display.
 ```
-As you can see, there will only be one `HTTP/1.1"` within the logs.
+As you can see, there will only be one HTTP call within the logs.
 
 Before you move to the next step, please remove the broken cloudant and circuit breaker policy.
 ```shell
