@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-speaker
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-speaker
+        image: <docker_username>/microservice-speaker
         ports:
           - containerPort: 9080
 ---

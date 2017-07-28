@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-webapp
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-webapp
+        image: <docker_username>/microservice-webapp
         ports:
           - containerPort: 9080
 ---

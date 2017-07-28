@@ -35,11 +35,11 @@ kubectl delete --ignore-not-found=true -f manifests/deploy-webapp.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-cloudant.yaml
 kubectl delete --ignore-not-found=true -f manifests/deploy-job.yaml
 kubectl delete --ignore-not-found=true -f manifests/ingress.yaml
-sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
-sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-session.yaml
-sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
-sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-vote.yaml
-sed -i s#"registry.ng.bluemix.net/<namespace>"#"docker.io/tomcli"# manifests/deploy-webapp.yaml
+sed -i s#"<docker_username>"#"docker.io/tomcli"# manifests/deploy-schedule.yaml
+sed -i s#"<docker_username>"#"docker.io/tomcli"# manifests/deploy-session.yaml
+sed -i s#"<docker_username>"#"docker.io/tomcli"# manifests/deploy-speaker.yaml
+sed -i s#"<docker_username>"#"docker.io/tomcli"# manifests/deploy-vote.yaml
+sed -i s#"<docker_username>"#"docker.io/tomcli"# manifests/deploy-webapp.yaml
 
 curl -L https://git.io/getIstio | sh -
 cd $(ls | grep istio)

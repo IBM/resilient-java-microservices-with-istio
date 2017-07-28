@@ -17,7 +17,7 @@ spec:
       containers:
       - name: microservice-vote
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-vote
+        image: <docker_username>/microservice-vote
         ports:
           - containerPort: 9080
 ---
@@ -39,8 +39,8 @@ spec:
     spec:
       containers:
       - name: microservice-vote
-        #change this image name 
-        image: registry.ng.bluemix.net/<namespace>/microservice-vote-cloudant
+        #change this image name
+        image: <docker_username>/microservice-vote-cloudant
         imagePullPolicy: Always
         env:
         - name: dbUsername

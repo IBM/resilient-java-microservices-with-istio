@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-session
         #change the image name
-        image: registry.ng.bluemix.net/<namespace>/microservice-session
+        image: <docker_username>/microservice-session
         ports:
           - containerPort: 9080
 
