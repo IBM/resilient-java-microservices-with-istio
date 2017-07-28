@@ -1,0 +1,68 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: cloudant-pv2
+  labels:
+    app: microprofile-app
+spec:
+  capacity:
+    storage: 4Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/var/cloudant2"
+  persistentVolumeReclaimPolicy: Recycle
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: cloudant-pv-claim2
+  labels:
+    app: microprofile-app
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cloudant-db2
+  labels:
+    app: microprofile-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: cloudant-deployment
+        version: v2
+    spec:
+      containers:
+      - name: cloudant-db
+        image: ibmcom/cloudant-developer:1.0.1
+        imagePullPolicy: Always
+        env:
+        - name: dbUsername
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbUsername
+        - name: dbPassword
+          valueFrom:
+            secretKeyRef:
+              name: cloudant-secret
+              key: dbPassword
+        securityContext:
+          privileged: true
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: cloudant-pv2
+          mountPath: /srv
+      volumes:
+        - name: cloudant-pv2
+          persistentVolumeClaim:
+            claimName: cloudant-pv-claim2
