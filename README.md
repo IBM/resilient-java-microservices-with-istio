@@ -312,7 +312,7 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-Next, let the circuit breaker eject any broken pod in your load balancing pool to avoid further failures. To demonstrate this, create a new cloudant database, cloudant-db2, that listens to the wrong host.
+A load balancing pool is a set of instances that under the same service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
 
 ```shell
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-broken-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
@@ -324,14 +324,14 @@ To better test the load balancing pool ejection, you don't want the circuit brea
 istioctl replace -f manifests/circuit-breaker-db.yaml
 ```
 
-Now go to the MicroProfile example on your browser and vote on any session. Then you will see the first vote will return a 500 server error because the cloudant-db2 is broken. However, the circuit breaker will detect that error and eject that broken cloudant pod out of the load balancing pool. Thus, if you keep voting within the next 15 minutes, none of that traffic will go to the broken cloudant because it won't return to the load balancing pool until 15 minutes later. 
+Now go to the MicroProfile example on your browser and vote on any session. Then you will see the first vote will return a 500 server error because the cloudant-db pod 2 is broken. However, the circuit breaker will detect that error and eject that broken cloudant pod out of the pool. Thus, if you keep voting within the next 15 minutes, none of that traffic will go to the broken cloudant because it won't return to the pool until 15 minutes later. 
 
 ![circuit breaker2](images/circuit_breaker2.png)
 
 You can double check the broken cloudant only received the traffic once. 
 ```shell
-kubectl get pods # check your cloudant-db2 name
-kubectl logs cloudant-db2-xxxxxxx-xxxxx proxy --tail=150 # You can replace 150 with the number of logs you like to display.
+kubectl get pods # check your cloudant-db-second name
+kubectl logs cloudant-db-second-xxxxxxx-xxxxx proxy --tail=150 # You can replace 150 with the number of logs you like to display.
 ```
 As you can see, there will only be one HTTP call within the logs.
 
