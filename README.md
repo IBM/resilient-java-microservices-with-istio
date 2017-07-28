@@ -312,7 +312,7 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-A load balancing pool is a set of instances that under the same service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
+A load balancing pool is a set of instances that are under the same Kubernetes service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
 
 ```shell
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-broken-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
