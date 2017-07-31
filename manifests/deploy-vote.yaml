@@ -17,7 +17,7 @@ spec:
       containers:
       - name: microservice-vote
         #change the image name
-        image: <docker_username>/microservice-vote
+        image: ibmjourney/microservice-vote
         ports:
           - containerPort: 9080
 ---
@@ -40,7 +40,7 @@ spec:
       containers:
       - name: microservice-vote
         #change this image name
-        image: <docker_username>/microservice-vote-cloudant
+        image: ibmjourney/microservice-vote-cloudant
         imagePullPolicy: Always
         env:
         - name: dbUsername

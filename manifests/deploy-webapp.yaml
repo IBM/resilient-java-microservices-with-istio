@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-webapp
         #change the image name
-        image: <docker_username>/microservice-webapp
+        image: ibmjourney/microservice-webapp
         ports:
           - containerPort: 9080
 ---

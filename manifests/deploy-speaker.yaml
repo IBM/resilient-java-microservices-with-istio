@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-speaker
         #change the image name
-        image: <docker_username>/microservice-speaker
+        image: ibmjourney/microservice-speaker
         ports:
           - containerPort: 9080
 ---

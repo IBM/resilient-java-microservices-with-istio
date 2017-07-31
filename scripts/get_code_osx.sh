@@ -43,10 +43,10 @@ mvn_clean sample.microservicebuilder.vote
 docker build -t $1/microservice-vote-cloudant sample.microservicebuilder.vote
 docker push $1/microservice-vote-cloudant
 
-sed -i '' s#"<docker_username>"#$1# manifests/deploy-schedule.yaml
-sed -i '' s#"<docker_username>"#$1# manifests/deploy-session.yaml
-sed -i '' s#"<docker_username>"#$1# manifests/deploy-speaker.yaml
-sed -i '' s#"<docker_username>"#$1# manifests/deploy-vote.yaml
-sed -i '' s#"<docker_username>"#$1# manifests/deploy-webapp.yaml
+sed -i '' s#"ibmjourney"#$1# manifests/deploy-schedule.yaml
+sed -i '' s#"ibmjourney"#$1# manifests/deploy-session.yaml
+sed -i '' s#"ibmjourney"#$1# manifests/deploy-speaker.yaml
+sed -i '' s#"ibmjourney"#$1# manifests/deploy-vote.yaml
+sed -i '' s#"ibmjourney"#$1# manifests/deploy-webapp.yaml
 
 echo "All your images are uploaded to your $1 Dockerhub."
