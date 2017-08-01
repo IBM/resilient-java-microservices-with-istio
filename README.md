@@ -158,7 +158,7 @@ docker push <docker_username>/microservice-vote-cloudant
 
 The great thing about Istio is you can deploy you application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository.
 
-Before you proceed to the following steps, change the `ibmjourney` in your yaml files to your own docker username if you want to use your own docker images.
+Before you proceed to the following steps, change the `journeycode` in your yaml files to your own docker username if you want to use your own docker images.
 >Note: If you ran the **get_code** script, your docker username is already changed in your yaml files.
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:

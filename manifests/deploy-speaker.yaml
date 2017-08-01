@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-speaker
         #change the image name
-        image: ibmjourney/microservice-speaker
+        image: journeycode/microservice-speaker
         ports:
           - containerPort: 9080
 ---
