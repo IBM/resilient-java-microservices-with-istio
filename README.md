@@ -1,12 +1,12 @@
 [![Build Status](https://travis-ci.org/IBM/resilient-java-microservices-with-istio.svg?branch=master)](https://travis-ci.org/IBM/resilient-java-microservices-with-istio)
 
-# Enable your Java MicroProfile microservices with advanced resiliency features leveraging Istio 
+# Enable your Java microservices with advanced resiliency features leveraging Istio 
 
-[MicroProfile](http://microprofile.io) is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and pakaging Java microservices in a standardized way.
+Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accomodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
 
-Building and packaging these Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accomodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
+In this code we demonstrate how to build and deploy your Java MicroProfile microservices leveraging Istio service mesh. [MicroProfile](http://microprofile.io) is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and pakaging Java microservices in a standardized way. 
 
-In this code we demonstrate how to build and deploy your Java MicroProfile microservices leveraging Istio service mesh. We then show how to configure and use circuit breakers, healthe checks and timeouts/retries resiliency features for the application.
+We then show how to configure and use circuit breakers, health checks and timeouts/retries resiliency features for the application.
 
 **Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some of resiliency features it supports are: 
 
