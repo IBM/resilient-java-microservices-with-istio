@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: microservice-vote-sample-v1
+  name: microservice-vote-sample
   labels:
     app: microprofile-app
     version: v1
@@ -13,29 +13,6 @@ spec:
         name: vote-deployment
         app: vote-deployment
         version: v1
-    spec:
-      containers:
-      - name: microservice-vote
-        #change the image name
-        image: journeycode/microservice-vote
-        ports:
-          - containerPort: 9080
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: microservice-vote-sample-v2
-  labels:
-    app: microprofile-app
-    version: v2
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        name: vote-deployment
-        app: vote-deployment
-        version: v2
     spec:
       containers:
       - name: microservice-vote
