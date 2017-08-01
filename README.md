@@ -258,7 +258,7 @@ Now go to the vote section, you should see that half of the time the vote is emp
 
 Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
 
-Now we will show you how to enable circuit breaker for the sample Java microservice application based on maximum connections your database can handle.. 
+Now we will show you how to enable circuit breaker for the sample Java microservice application based on maximum connections your database can handle.
 
 In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
 
@@ -270,7 +270,7 @@ Before we move on, we need to understand these different types of Circuit Breake
 - Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
 - Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `httpMaxPendingRequests` field.
 
-Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject all their requests for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
+Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
 
 ```yaml
 type: destination-policy
@@ -300,6 +300,35 @@ istioctl create -f manifests/circuit-breaker-db.yaml
 Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode** on your browser, and click on **network**. Go to Speaker or Session and try to vote 5 times within a second. Then, you should see the last 2 to 3 vote will return a server error because there are more than one pending request get sent to cloudant. Therefore, the circuit breaker will eject the rest of the requests.
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
+
+A load balancing pool is a set of instances that are under the same Kubernetes service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
+
+```shell
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-broken-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+```
+
+To better test the load balancing pool ejection, you don't want the circuit breaker to eject requests for maximum connection and pending requests. Hence, remove `maxConnections: 1` and `httpMaxPendingRequests: 1` inside **manifests/circuit-breaker-db.yaml** and run
+
+```shell
+istioctl replace -f manifests/circuit-breaker-db.yaml
+```
+
+Now go to the MicroProfile example on your browser and vote on any session. Then you will see the first vote will return a 500 server error because the cloudant-db pod 2 is broken. However, the circuit breaker will detect that error and eject that broken cloudant pod out of the pool. Thus, if you keep voting within the next 15 minutes, none of that traffic will go to the broken cloudant because it won't return to the pool until 15 minutes later. 
+
+![circuit breaker2](images/circuit_breaker2.png)
+
+You can double check the broken cloudant only received the traffic once. 
+```shell
+kubectl get pods # check your cloudant-db-second name
+kubectl logs cloudant-db-second-xxxxxxx-xxxxx proxy --tail=150 # You can replace 150 with the number of logs you like to display.
+```
+As you can see, there will only be one HTTP call within the logs.
+
+Before you move to the next step, please remove the broken cloudant and circuit breaker policy.
+```shell
+kubectl delete -f manifests/deploy-broken-cloudant.yaml
+istioctl delete -f maniests/circuit-breaker-db.yaml
+```
 
 ## 5. Add resiliency feature - Timeouts and Retries
 
