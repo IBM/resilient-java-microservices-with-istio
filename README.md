@@ -327,7 +327,7 @@ As you can see, there will only be one HTTP call within the logs.
 Before you move to the next step, please remove the broken cloudant and circuit breaker policy.
 ```shell
 kubectl delete -f manifests/deploy-broken-cloudant.yaml
-istioctl delete -f maniests/circuit-breaker-db.yaml
+istioctl delete -f manifests/circuit-breaker-db.yaml
 ```
 
 ## 5. Add resiliency feature - Timeouts and Retries
