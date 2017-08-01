@@ -16,7 +16,7 @@ spec:
       containers:
       - name: microservice-session
         #change the image name
-        image: <docker_username>/microservice-session
+        image: journeycode/microservice-session
         ports:
           - containerPort: 9080
 
