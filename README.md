@@ -47,11 +47,11 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 1. [Get and build the application code](#1-get-and-build-the-application-code)
 2. [Deploy application microservices and Istio envoys](#2-deploy-application-microservices-and-istio-envoys)
 
-## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
+## Part B: Explore Istio resiliency features: Circuit Breakers and Fault Injection
 
-3. [Create a traffic flow rule for your microservices](#3-create-a-traffic-flow-rule-for-your-microservices)
-4. [Add resiliency feature - Circuit Breakers](#4-add-resiliency-feature---circuit-breakers)
-5. [Add resiliency feature - Timeouts and Retries](#5-add-resiliency-feature---timeouts-and-retries)
+3. [Circuit Breakers - Maximum connections and pending requests](#3-circuit-breakers---maximum-connections-and-pending-requests)
+4. [Circuit Breakers - Load balancing pool ejection](#4-circuit-breakers---load-balancing-pool-ejection)
+5. [Timeouts and Retries](#5-timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -96,14 +96,7 @@ Now, make sure you login to Docker first before you proceed to the following ste
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.session.git
   ```
-   * [Vote Version 1](https://github.com/WASdev/sample.microservicebuilder.vote/tree/4bd11a9bcdc7f445d7596141a034104938e08b22) 
-   ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.vote.git vote-v1
-      cd vote-v1
-      git checkout 4bd11a9bcdc7f445d7596141a034104938e08b22
-      cd ..
-  ```
-   * [Vote Version 2](https://github.com/WASdev/sample.microservicebuilder.vote) 
+   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote) 
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
   ```
@@ -139,14 +132,7 @@ docker build -t <docker_username>/microservice-session sample.microservicebuilde
 docker push <docker_username>/microservice-session
 ```
 
-Build the vote version 1 microservice container
-
-```shell
-docker build -t <docker_username>/microservice-vote vote-v1
-docker push <docker_username>/microservice-vote
-```
-
-Build the vote version 2 microservice container
+Build the vote microservice container
 
 ```shell
 docker build -t <docker_username>/microservice-vote-cloudant sample.microservicebuilder.vote
@@ -184,8 +170,7 @@ istio-pilot-2676867826-z63pq                   2/2       Running     0          
 microservice-schedule-sample-971365647-74648   2/2       Running     0          2d
 microservice-session-sample-2341329899-2bjhg   2/2       Running     0          2d
 microservice-speaker-sample-1294850951-w76b5   2/2       Running     0          2d
-microservice-vote-sample-v1-3410940397-9cm8m   2/2       Running     0          1h
-microservice-vote-sample-v2-3728755778-5c4vx   2/2       Running     0          1h
+microservice-vote-sample-3728755778-5c4vx      2/2       Running     0          1h
 microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d   
 ```
 
@@ -193,12 +178,6 @@ To access your application, you want to create an ingress to connect all the mic
 
 ```shell
 kubectl create -f manifests/ingress.yaml
-```
-
-Since we have 2 version of vote deployment, we need to setup a route rule to avoid version conflict. The following route rule will sent all the traffic to version 1 vote deployment.
-
-```shell
-istioctl create -f manifests/route-rule-v1.yaml
 ```
 
 You can check the public IP address of your cluster through `kubectl get nodes` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
@@ -212,61 +191,13 @@ Point your browser to:
 
 Congratulations, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
 
+## Part B: Explore Istio resiliency features: Circuit Breakers and Fault Injection
 
-## Part B: Explore Istio features: Configuring Request Routing, Circuit Breakers, and Fault Injection
-
-## 3. Create a traffic flow rule for your microservices
-
-Istio can dynamically modify the network traffic between some of the components of our application. You can configure all or a certain percentage of the traffic to flow to one version. This feature is very convenient when it comes to A/B Testing and Canary deployments. 
-
-From the previous step, you used the Istio route rule to modify the network traffic to version 1 vote. Now you have 2 different version of microservice vote sample, let's create a new Istio route rule to split the traffic to each version. First, take a look at the **manifests/route-rule-vote.yaml** file.
-
-```yaml
-type: route-rule
-name: vote-default
-spec:
-  destination: vote-service.default.svc.cluster.local
-  precedence: 1
-  route:
-  - tags:
-      version: v1
-    weight: 50
-  - tags:
-      version: v2
-    weight: 50
-```
-
-This route-rule will let each version receive 50% of the traffic. You can change the **weight** to split more traffic on a particular version. Make sure all the weights add up to 100.
-
-![traffic routing](images/traffic_routing.png)
-
-Now let's apply this rule to your Istio Pilot.
-
-```shell
-istioctl replace -f manifests/route-rule-vote.yaml
-istioctl get route-rules -o yaml #You can view all your route-rules by executing this command
-```
-
-Now each version of your vote microservice should receive half of the traffic. Let's test it out by accessing your application.
-
-Point your browser to:  
-`http://<IP:NodePort>` Replace with your own IP and NodePort.
-
-Now go to the vote section, you should see that half of the time the vote is empty since there's no data initialized in the database. You can start voting at the speaker or session section to see the vote microservice is reflecting your changes. (You browser may cache some of the JavaScript files, so it might take 10 to 20 seconds to start loading the actual changes.)
-
-> Note: Your microservice vote version 2 will use cloudantDB as the database, and it will initialize the database on your first POST request on the app. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new databases.
-
-## 4. Add resiliency feature - Circuit Breakers
+## 3. Circuit Breakers - Maximum connections and pending requests
 
 Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
 
 Now we will show you how to enable circuit breaker for the sample Java microservice application based on maximum connections your database can handle.
-
-In order to test this example, we want all our traffic routed to v2. Therefore, apply this route rule.
-
-```shell
-istioctl replace -f manifests/route-rule-v2.yaml
-```
 
 Before we move on, we need to understand these different types of Circuit Breaker:
 - Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
@@ -303,6 +234,10 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
+## 4. Circuit Breakers - Load balancing pool ejection
+
+> Note: We will use the same circuit breaker policy from the previous step.
+
 A load balancing pool is a set of instances that are under the same Kubernetes service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
 
 ```shell
@@ -332,7 +267,7 @@ kubectl delete -f manifests/deploy-broken-cloudant.yaml
 istioctl delete -f manifests/circuit-breaker-db.yaml
 ```
 
-## 5. Add resiliency feature - Timeouts and Retries
+## 5. Timeouts and Retries
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
@@ -408,6 +343,8 @@ istioctl delete -f manifests/<filename>.yaml #Replace <filename> with the rule/p
 mvn dependency:purge-local-repository
 mvn clean package
 ```
+
+* Your microservice vote will use cloudantDB as the database, and it will initialize the database on your first POST request on the application. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new database.
 
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)

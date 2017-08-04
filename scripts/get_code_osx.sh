@@ -30,14 +30,6 @@ mvn_clean sample.microservicebuilder.session
 docker build -t $1/microservice-session sample.microservicebuilder.session
 docker push $1/microservice-session
 
-git clone https://github.com/WASdev/sample.microservicebuilder.vote.git vote-v1
-cd vote-v1
-git checkout 4bd11a9bcdc7f445d7596141a034104938e08b22
-mvn clean package
-docker build -t $1/microservice-vote .
-docker push $1/microservice-vote
-cd ..
-
 git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
 mvn_clean sample.microservicebuilder.vote
 docker build -t $1/microservice-vote-cloudant sample.microservicebuilder.vote

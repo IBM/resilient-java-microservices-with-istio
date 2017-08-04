@@ -1,8 +1,0 @@
-type: route-rule
-name: vote-default
-spec:
-  destination: vote-service.default.svc.cluster.local
-  precedence: 1
-  route:
-  - tags:
-      version: v1
