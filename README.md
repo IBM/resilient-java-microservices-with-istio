@@ -49,9 +49,9 @@ Please follow the [Toolchain instructions](https://github.com/IBM/container-jour
 
 ## Part B: Explore Istio resiliency features: Circuit Breakers and Fault Injection
 
-3. [Add resiliency feature - Circuit Breakers (Maximum connections and pending requests)](#3-add-resiliency-feature---circuit-breakers-maximum-connections-and-pending-requests)
-4. [Add resiliency feature - Circuit Breakers (Load balancing pool ejection)](#4-add-resiliency-feature---circuit-breakers-load-balancing-pool-ejection)
-5. [Add resiliency feature - Timeouts and Retries](#5-add-resiliency-feature---timeouts-and-retries)
+3. [Circuit Breakers - Maximum connections and pending requests](#3-circuit-breakers---maximum-connections-and-pending-requests)
+4. [Circuit Breakers - Load balancing pool ejection](#4-circuit-breakers---load-balancing-pool-ejection)
+5. [Timeouts and Retries](#5-timeouts-and-retries)
 
 #### [Troubleshooting](#troubleshooting-1)
 
@@ -193,7 +193,7 @@ Congratulations, you MicroProfile application is running and it should look like
 
 ## Part B: Explore Istio resiliency features: Circuit Breakers and Fault Injection
 
-## 3. Add resiliency feature - Circuit Breakers (Maximum connections and pending requests)
+## 3. Circuit Breakers - Maximum connections and pending requests
 
 Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
 
@@ -234,7 +234,7 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
-## 4. Add resiliency feature - Circuit Breakers (Load balancing pool ejection)
+## 4. Circuit Breakers - Load balancing pool ejection
 
 > Note: We will use the same circuit breaker policy from the previous step.
 
@@ -267,7 +267,7 @@ kubectl delete -f manifests/deploy-broken-cloudant.yaml
 istioctl delete -f manifests/circuit-breaker-db.yaml
 ```
 
-## 5. Add resiliency feature - Timeouts and Retries
+## 5. Timeouts and Retries
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
