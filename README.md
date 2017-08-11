@@ -15,8 +15,10 @@ We then show how to configure and use circuit breakers, health checks and timeou
  - Health checks
  - Control connection pool size and request load
  - Systematic fault injection
- 
+
 We use the sample MicroProfile web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on WebSphere Liberty, in Docker containers managed by Kubernetes.
+
+MicroProfile Fault Tolerance, adding application-specific capabilities such as failback functions that can work in conjunction with, or independently from, Istio capabilities will be the subject of a future update.
 
 ![MicroProfile-Istio](images/microprofile-istio.png)
 
@@ -26,6 +28,7 @@ We use the sample MicroProfile web application for managing a conference and it 
 - [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
+- [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
 
 # Prerequisite
 - Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
