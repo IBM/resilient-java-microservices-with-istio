@@ -1,6 +1,6 @@
 echo "Creating Java MicroProfile App"
 
-IP_ADDR=$(bx cs workers $CLUSTER_NAME | grep normal | awk '{ print $2 }')
+IP_ADDR=$(bx cs workers $CLUSTER_NAME | grep normal | awk '{ print $2 }' | head -1)
 if [ -z $IP_ADDR ]; then
   echo "$CLUSTER_NAME not created or workers not ready"
   exit 1
@@ -71,7 +71,7 @@ echo "Java MicroProfile done."
 echo "Getting IP and Port"
 kubectl get nodes
 kubectl get svc | grep ingress
-export GATEWAY_URL=$(kubectl get po -l istio=ingress -o 'jsonpath={.items[0].status.hostIP}'):$(kubectl get svc istio-ingress -o 'jsonpath={.spec.ports[0].nodePort}')
+export GATEWAY_URL=$IP_ADDR:$(kubectl get svc istio-ingress -o 'jsonpath={.spec.ports[0].nodePort}')
 echo $GATEWAY_URL
 if [ -z "$GATEWAY_URL" ]
 then
