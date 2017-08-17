@@ -185,7 +185,7 @@ kubectl create -f manifests/ingress.yaml
 
 You can check the public IP address of your cluster through `bx cs workers <your_cluster_name>` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2;exit }'):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
 # Replace <your_cluster_name> with your cluster name. This should output your IP:NodePort e.g. 184.172.247.2:30344
 ```
 

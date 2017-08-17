@@ -1,6 +1,6 @@
 echo "Creating Java MicroProfile App"
 
-IP_ADDR=$(bx cs workers $CLUSTER_NAME | grep normal | awk '{ print $2;exit }')
+IP_ADDR=$(bx cs workers $CLUSTER_NAME | grep normal | awk '{ print $2 }' | head -1)
 if [ -z $IP_ADDR ]; then
   echo "$CLUSTER_NAME not created or workers not ready"
   exit 1
