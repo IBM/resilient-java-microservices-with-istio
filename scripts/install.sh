@@ -88,7 +88,8 @@ function health_check() {
 
 export GATEWAY_URL=$(bx cs workers $CLUSTER | grep normal | awk '{ print $2}' | head -1):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
 sleep 60s #wait for Websphere Liberty to be up
-HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL)
+export HEALTH=$(curl -o /dev/null -s -w "%{http_code}\n" http://$GATEWAY_URL)
+echo $HEALTH
 if [ $HEALTH -eq 200 ]
 then
   echo "Everything looks good."
