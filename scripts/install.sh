@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function install_bluemix_cli() {
 #statements
