@@ -11,12 +11,19 @@ addons:
     packages:
       - shellcheck
 
+env:
+  - TEST_RUN="./tests/test-kubeadm-dind-cluster.sh"
+  - TEST_RUN="./tests/test-kubernetes.sh"
+
 before_install:
   - pip install -U -r test-requirements.txt
 
 install:
   - "./scripts/install.sh"
+  - "./scripts/bx_auth.sh"
 
 before script:
   - "./tests/test-shellcheck.sh"
   - "./tests/test-yamllint.sh"
+
+script: "$TEST_RUN"
