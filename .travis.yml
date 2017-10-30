@@ -1,8 +1,22 @@
-language: bash
-script: true
+---
+language: python
+python: 2.7
+cache: pip
 sudo: required
+
+addons:
+  apt:
+    sources:
+      - debian-sid
+    packages:
+      - shellcheck
+
 before_install:
-- bash scripts/install.sh
-group: stable
-dist: precise
-os: linux
+  - pip install -U -r test-requirements.txt
+
+install:
+  - "./scripts/install.sh"
+
+before script:
+  - "./tests/test-shellcheck.sh"
+  - "./tests/test-yamllint.sh"
