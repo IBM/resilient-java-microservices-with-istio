@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/IBM/resilient-java-microservices-with-istio.svg?branch=master)](https://travis-ci.org/IBM/resilient-java-microservices-with-istio)
+![Bluemix Deployments](https://metrics-tracker.mybluemix.net/stats/d72bb55cd318bc218ace273bf0789833/badge.svg)
 
 # Enable your Java microservices with advanced resiliency features leveraging Istio 
 
@@ -26,7 +27,7 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio](https://istio.io/)
+- [Istio (1.6)](https://istio.io/)
 - [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
@@ -41,7 +42,7 @@ If you want to deploy the Java MicroProfile app directly to Bluemix, click on 'D
 
 > You will need to create your Kubernetes cluster first and make sure it is fully deployed in your Bluemix account.
 
-[![Create Toolchain](https://github.com/IBM/container-journey-template/blob/master/images/button.png)](https://console.ng.bluemix.net/devops/setup/deploy/)
+[![Create Toolchain](https://metrics-tracker.mybluemix.net/stats/d72bb55cd318bc218ace273bf0789833/button.svg)](https://console.ng.bluemix.net/devops/setup/deploy/)
 
 Please follow the [Toolchain instructions](https://github.com/IBM/container-journey-template/blob/master/Toolchain_Instructions_new.md) to complete your toolchain and pipeline.
 
@@ -350,6 +351,8 @@ mvn clean package
 ```
 
 * Your microservice vote will use cloudantDB as the database, and it will initialize the database on your first POST request on the application. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new database.
+
+* Please avoid using Kubernetes 1.7.x on this example since version 1.7.x has a bug that will corrupt the cloudant database pods.
 
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)

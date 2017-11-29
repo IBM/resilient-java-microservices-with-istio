@@ -30,12 +30,19 @@ kubectl_config() {
 kubectl_deploy() {
     kubeclt_clean
 
+    echo "install Istio"
+    curl -L https://git.io/getIstio | sh -
+    cd $(ls | grep istio)
+    export PATH="$PATH:$(pwd)/bin"
+    kubectl apply -f install/kubernetes/istio.yaml
+    cd ..
+
     echo "Running scripts/quickstart.sh"
     "$(dirname "$0")"/../scripts/quickstart.sh
 
     echo "Waiting for pods to be running"
     i=0
-    while [[ $(kubectl get pods | grep -c Running) -ne 3 ]]; do
+    while [[ $(kubectl get pods | grep -c Running) -ne 6 ]]; do
         if [[ ! "$i" -lt 24 ]]; then
             echo "Timeout waiting on pods to be ready"
             test_failed "$0"
@@ -52,9 +59,10 @@ kubectl_deploy() {
 
 verify_deploy(){
     echo "Verifying deployment was successful"
+    PORT=$(kubectl get svc -n istio-system istio-ingress -o jsonpath={.spec.ports[0].nodePort})
     IPS=$(bx cs workers "$CLUSTER_NAME" | awk '{ print $2 }' | grep '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
     for IP in $IPS; do
-        if ! curl -sS http://"$IP":8080/version; then
+        if ! curl -sS http://"$IP":"$PORT"; then
             test_failed "$0"
         fi
     done

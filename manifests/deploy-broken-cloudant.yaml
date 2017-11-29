@@ -17,6 +17,8 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: cloudant-pv-claim2
+  annotations:
+    volume.beta.kubernetes.io/storage-class: ""
   labels:
     app: microprofile-app
 spec:

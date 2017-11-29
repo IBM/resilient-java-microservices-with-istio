@@ -15,7 +15,6 @@ kubectl_deploy() {
     curl -L https://git.io/getIstio | sh -
     cd $(ls | grep istio)
     export PATH="$PATH:$(pwd)/bin"
-    kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
     kubectl apply -f install/kubernetes/istio.yaml
 
     echo "Running scripts/quickstart.sh"
@@ -38,7 +37,7 @@ kubectl_deploy() {
 
 verify_deploy(){
     echo "Verifying deployment was successful"
-    if ! curl -sS http://$(bx cs workers [docker username] | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort}); then
+    if ! sleep 1 && curl -sS "$(kubectl get svc -n istio-system istio-ingress | grep istio-ingress | awk '{ print $2 }')":$(kubectl get svc -n istio-system istio-ingress -o jsonpath={.spec.ports[0].nodePort}); then
         test_failed "$0"
     fi
 }
