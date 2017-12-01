@@ -32,10 +32,10 @@ kubectl_deploy() {
 
     echo "install Istio"
     curl -L https://git.io/getIstio | sh -
-    cd $(ls | grep istio)
+    pushd $(ls | grep istio)
     export PATH="$PATH:$(pwd)/bin"
     kubectl apply -f install/kubernetes/istio.yaml
-    cd ..
+    popd
 
     echo "Running scripts/quickstart.sh"
     "$(dirname "$0")"/../scripts/quickstart.sh

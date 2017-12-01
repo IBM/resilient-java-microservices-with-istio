@@ -27,7 +27,7 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio (1.6)](https://istio.io/)
+- [Istio (1.6)](https://istio.io/v-0.1/docs/)
 - [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
