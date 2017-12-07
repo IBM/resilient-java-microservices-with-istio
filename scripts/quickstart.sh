@@ -8,4 +8,4 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --incl
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 kubectl get nodes
-kubectl get svc istio-ingress
+kubectl get svc -n istio-system istio-ingress
