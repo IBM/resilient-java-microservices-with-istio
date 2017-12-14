@@ -18,13 +18,6 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/"$(curl -s ht
 chmod 0755 kubectl
 sudo mv kubectl /usr/local/bin
 
-echo "install Istio"
-curl -L https://git.io/getIstio | sh -
-cd $(ls | grep istio)
-export PATH="$PATH:$(pwd)/bin"
-kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
-kubectl apply -f install/kubernetes/istio.yaml
-
 echo "Install the Bluemix container-service plugin"
 bx plugin install container-service -r Bluemix
 

@@ -27,15 +27,15 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio (1.6)](https://istio.io/v-0.1/docs/)
-- [Kubernetes Clusters](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
+- [Istio (2.12+)](https://istio.io/)
+- [Kubernetes Clusters (1.8+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 - [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
 
 # Prerequisite
-- Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://github.com/IBM/container-journey-template) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
-- You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio getting started](https://github.com/IBM/Istio-getting-started), to get Istio mesh installed on Kubernetes.
+- Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, or with [IBM Bluemix Container Service](https://console.bluemix.net/docs/containers/container_index.html#clusters) to deploy in the cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
+- You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio Quick Start](https://istio.io/docs/setup/kubernetes/quick-start.html), to get Istio mesh installed on Kubernetes.
 
 # Deploy to Bluemix
 If you want to deploy the Java MicroProfile app directly to Bluemix, click on 'Deploy to Bluemix' button below to create a [Bluemix DevOps service toolchain and pipeline](https://console.ng.bluemix.net/docs/services/ContinuousDelivery/toolchains_about.html#toolchains_about) for deploying the sample, else jump to [Steps](#steps)
@@ -169,10 +169,6 @@ After a few minutes, you should now have your Kubernetes Pods running and have a
 $ kubectl get pods
 NAME                                           READY     STATUS      RESTARTS   AGE
 cloudant-db-4102896723-6ztmw                   2/2       Running     0          1h
-istio-egress-3946387492-5wtbm                  1/1       Running     0          2d
-istio-ingress-4179457893-clzjf                 1/1       Running     0          2d
-istio-mixer-2598054512-bm3st                   1/1       Running     0          2d
-istio-pilot-2676867826-z63pq                   2/2       Running     0          2d
 microservice-schedule-sample-971365647-74648   2/2       Running     0          2d
 microservice-session-sample-2341329899-2bjhg   2/2       Running     0          2d
 microservice-speaker-sample-1294850951-w76b5   2/2       Running     0          2d
@@ -186,9 +182,9 @@ To access your application, you want to create an ingress to connect all the mic
 kubectl create -f manifests/ingress.yaml
 ```
 
-You can check the public IP address of your cluster through `bx cs workers <your_cluster_name>` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
+You can check the public IP address of your IBM Cloud cluster through `bx cs workers <your_cluster_name>` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc -n istio-system | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingress -o jsonpath={.spec.ports[0].nodePort})
+echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingress -n istio-system -o jsonpath={.spec.ports[0].nodePort})
 # Replace <your_cluster_name> with your cluster name. This should output your IP:NodePort e.g. 184.172.247.2:30344
 ```
 
@@ -212,19 +208,22 @@ Before we move on, we need to understand these different types of Circuit Breake
 Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
 
 ```yaml
-type: destination-policy
-name: db-circuit
+apiVersion: config.istio.io/v1alpha2
+kind: DestinationPolicy
+metadata:
+  name: db-circuit
+  namespace: default
 spec:
-  destination: cloudant-service.default.svc.cluster.local
-  policy:
-    - circuitBreaker:
-        simpleCb:
-          maxConnections: 1
-          httpMaxPendingRequests: 1
-          httpConsecutiveErrors: 1     
-          sleepWindow: 15m             #required field
-          httpDetectionInterval: 1s    #required field   
-          httpMaxEjectionPercent: 100  
+  destination: 
+    name: cloudant-service
+  circuitBreaker:
+    simpleCb:
+      maxConnections: 1
+      httpMaxPendingRequests: 1
+      httpConsecutiveErrors: 1
+      sleepWindow: 15m                # Required field
+      httpDetectionInterval: 1s       # Required field
+      httpMaxEjectionPercent: 100  
 ```
 
 ![circuit breaker](images/circuit_breaker.png)
@@ -263,7 +262,7 @@ Now go to the MicroProfile example on your browser and vote on any session. Then
 You can double check the broken cloudant only received the traffic once. 
 ```shell
 kubectl get pods # check your cloudant-db-second name
-kubectl logs cloudant-db-second-xxxxxxx-xxxxx proxy --tail=150 # You can replace 150 with the number of logs you like to display.
+kubectl logs cloudant-db-second-xxxxxxx-xxxxx istio-proxy --tail=150 # You can replace 150 with the number of logs you like to display.
 ```
 As you can see, there will only be one HTTP call within the logs.
 
@@ -283,17 +282,17 @@ Then, in order to make sure we can trigger and test this, we will inject more th
 
 Now take a look at the **timeout-vote** file in manifests.
 ```yaml
-type: route-rule
-name: timeout
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: timeout
+  namespace: default
 spec:
-  destination: vote-service.default.svc.cluster.local
+  destination: 
+    name: vote-service
   httpReqTimeout:
     simpleTimeout:
       timeout: 1s
-  # httpReqRetries:
-  #   simpleRetry:
-  #     attempts: 3
-  #     perTryTimeout: 1s
 ```
 
 This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout. You also can apply retries rule by uncommenting the `httpReqRetries` section and delete/commenting out the `httpReqTimeout` section. Now, let's apply a 1-second timeout on your Vote service.
@@ -304,18 +303,18 @@ istioctl create -f manifests/timeout-vote.yaml
 
 In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
 ```yaml
-type: route-rule
-name: cloudant-delay
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: cloudant-delay
+  namespace: default
 spec:
-  destination: cloudant-service.default.svc.cluster.local
-  precedence: 2
+  destination: 
+    name: cloudant-service
   httpFault:
     delay:
       percent: 100
       fixedDelay: 1.1s
-    # abort:
-    #   percent: 10
-    #   httpStatus: 503
 ```
 
 This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Furthermore, you can uncomment the abort section to inject some abort errors. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
