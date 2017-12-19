@@ -1,13 +1,12 @@
-type: route-rule
-name: cloudant-delay
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: cloudant-delay
+  namespace: default
 spec:
-  destination: cloudant-service.default.svc.cluster.local
-  precedence: 2
+  destination: 
+    name: cloudant-service
   httpFault:
     delay:
       percent: 100
       fixedDelay: 1.1s
-    # abort:
-    #   percent: 10
-    #   httpStatus: 503
-      

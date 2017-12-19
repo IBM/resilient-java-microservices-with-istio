@@ -28,7 +28,6 @@ echo "install Istio"
 curl -L https://git.io/getIstio | sh -
 cd $(ls | grep istio)
 export PATH="$PATH:$(pwd)/bin"
-kubectl apply -f install/kubernetes/istio-rbac-alpha.yaml
 kubectl apply -f install/kubernetes/istio.yaml
 
 #Make sure all the pods are running before proceeding to the next step.
@@ -71,7 +70,7 @@ echo "Java MicroProfile done."
 echo "Getting IP and Port"
 kubectl get nodes
 kubectl get svc | grep ingress
-export GATEWAY_URL=$IP_ADDR:$(kubectl get svc istio-ingress -o 'jsonpath={.spec.ports[0].nodePort}')
+export GATEWAY_URL=$IP_ADDR:$(kubectl get svc istio-ingress -n istio-system -o 'jsonpath={.spec.ports[0].nodePort}')
 echo $GATEWAY_URL
 if [ -z "$GATEWAY_URL" ]
 then
