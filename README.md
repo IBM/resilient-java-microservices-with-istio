@@ -5,13 +5,13 @@
 
 *Read this in other languages: [한국어](README-ko.md).*
 
-Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accomodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
+Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accommodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
 
-In this code we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and pakaging Java microservices in a standardized way. 
+In this code we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and packaging Java microservices in a standardized way. 
 
 We then show how to configure and use circuit breakers, health checks and timeouts/retries resiliency features for the application.
 
-**Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some of resiliency features it supports are: 
+**Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some resiliency features it supports are: 
 
  - Retries/Timeouts
  - Circuit breakers
@@ -27,8 +27,8 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio (2.12+)](https://istio.io/)
-- [Kubernetes Clusters (1.8+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
+- [Istio (0.2.12+)](https://istio.io/)
+- [Kubernetes Clusters (1.8.0+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 - [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
@@ -139,12 +139,12 @@ docker push <docker_username>/microservice-vote-cloudant
 ## 2. Deploy application microservices and Istio envoys
 
 
-The great thing about Istio is you can deploy you application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository.
+The great thing about Istio is you can deploy your application on Istio without changing any of your files. However, the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes). Therefore, you need to deploy the application with the yaml files in this repository.
 
 Before you proceed to the following steps, change the `journeycode` in your yaml files to your own docker username if you want to use your own docker images.
 >Note: If you ran the **get_code** script, your docker username is already changed in your yaml files.
 
-Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar to an existing microservice configuration, do:
+Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar into an existing microservice configuration, do:
 ```shell
 kubectl apply -f manifests/deploy-job.yaml #Create a secret for cloudant credential
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
@@ -267,7 +267,7 @@ istioctl delete -f manifests/circuit-breaker-db.yaml
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
 
-Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injetion.
+Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injection.
 
 ![fault tolerance](images/fault_tolerance.png)
 
