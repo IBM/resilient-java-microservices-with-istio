@@ -4,18 +4,12 @@ python: 2.7
 cache: pip
 sudo: required
 
-addons:
-  apt:
-    sources:
-      - debian-sid
-    packages:
-      - shellcheck
-
 env:
   - TEST_RUN="./tests/test-kubeadm-dind-cluster.sh"
   - TEST_RUN="./tests/test-kubernetes.sh"
 
 before_install:
+  - sudo apt-get install shellcheck
   - pip install -U -r test-requirements.txt
 
 install:
