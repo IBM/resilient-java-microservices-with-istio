@@ -1,17 +1,16 @@
 [![Build Status](https://travis-ci.org/IBM/resilient-java-microservices-with-istio.svg?branch=master)](https://travis-ci.org/IBM/resilient-java-microservices-with-istio)
-![Bluemix Deployments](https://metrics-tracker.mybluemix.net/stats/d72bb55cd318bc218ace273bf0789833/badge.svg)
 
-# Enable your Java microservices with advanced resiliency features leveraging Istio 
+# Enable your Java microservices with advanced resiliency features leveraging Istio
 
 *Read this in other languages: [한국어](README-ko.md).*
 
-Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accommodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice. 
+Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accommodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice.
 
-In this code we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and packaging Java microservices in a standardized way. 
+In this code we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and packaging Java microservices in a standardized way.
 
 We then show how to configure and use circuit breakers, health checks and timeouts/retries resiliency features for the application.
 
-**Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some resiliency features it supports are: 
+**Resiliency and fault tolerance**: Istio adds fault tolerance to your application without any changes to code. Some resiliency features it supports are:
 
  - Retries/Timeouts
  - Circuit breakers
@@ -63,13 +62,13 @@ Before you proceed to the following instructions, make sure you have [Maven](htt
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
 
 ```shell
-git clone https://github.com/IBM/resilient-java-microservices-with-istio.git 
+git clone https://github.com/IBM/resilient-java-microservices-with-istio.git
 cd resilient-java-microservices-with-istio
 ```
 
 Now, make sure you login to Docker first before you proceed to the following step.
 
-> **Note:** For the following steps, you can get the code and build the package by running 
+> **Note:** For the following steps, you can get the code and build the package by running
 > ```shell
 > ./scripts/get_code_linux.sh [docker username] #For Linux users
 > ./scripts/get_code_osx.sh [docker username] #For Mac users
@@ -93,7 +92,7 @@ Now, make sure you login to Docker first before you proceed to the following ste
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.session.git
   ```
-   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote) 
+   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote)
    ```shell
       git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
   ```
@@ -155,7 +154,7 @@ kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 ```
 
-After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote-v1, vote-v2, cloudant, and webapp**. 
+After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote-v1, vote-v2, cloudant, and webapp**.
 ```shell
 $ kubectl get pods
 NAME                                           READY     STATUS      RESTARTS   AGE
@@ -188,7 +187,7 @@ Congratulations, you MicroProfile application is running and it should look like
 
 ## 3. Circuit Breakers - Maximum connections and pending requests
 
-Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently. 
+Circuit breaking is a critical component of distributed systems. It’s nearly always better to fail quickly and apply back pressure downstream as soon as possible. Envoy enforces circuit breaking limits at the network level as opposed to having to configure and code each application independently.
 
 Now we will show you how to enable circuit breaker for the sample Java microservice application based on maximum connections your database can handle.
 
@@ -196,7 +195,7 @@ Before we move on, we need to understand these different types of Circuit Breake
 - Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
 - Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `httpMaxPendingRequests` field.
 
-Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field. 
+Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field.
 
 ```yaml
 apiVersion: config.istio.io/v1alpha2
@@ -205,7 +204,7 @@ metadata:
   name: db-circuit
   namespace: default
 spec:
-  destination: 
+  destination:
     name: cloudant-service
   circuitBreaker:
     simpleCb:
@@ -246,11 +245,11 @@ To better test the load balancing pool ejection, you don't want the circuit brea
 istioctl replace -f manifests/circuit-breaker-db.yaml
 ```
 
-Now go to the MicroProfile example on your browser and vote on any session. Then you will see the first vote will return a 500 server error because the cloudant-db pod 2 is broken. However, the circuit breaker will detect that error and eject that broken cloudant pod out of the pool. Thus, if you keep voting within the next 15 minutes, none of that traffic will go to the broken cloudant because it won't return to the pool until 15 minutes later. 
+Now go to the MicroProfile example on your browser and vote on any session. Then you will see the first vote will return a 500 server error because the cloudant-db pod 2 is broken. However, the circuit breaker will detect that error and eject that broken cloudant pod out of the pool. Thus, if you keep voting within the next 15 minutes, none of that traffic will go to the broken cloudant because it won't return to the pool until 15 minutes later.
 
 ![circuit breaker2](images/circuit_breaker2.png)
 
-You can double check the broken cloudant only received the traffic once. 
+You can double check the broken cloudant only received the traffic once.
 ```shell
 kubectl get pods # check your cloudant-db-second name
 kubectl logs cloudant-db-second-xxxxxxx-xxxxx istio-proxy --tail=150 # You can replace 150 with the number of logs you like to display.
@@ -265,7 +264,7 @@ istioctl delete -f manifests/circuit-breaker-db.yaml
 
 ## 5. Timeouts and Retries
 
-Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second. 
+Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second.
 
 Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injection.
 
@@ -279,7 +278,7 @@ metadata:
   name: timeout
   namespace: default
 spec:
-  destination: 
+  destination:
     name: vote-service
   httpReqTimeout:
     simpleTimeout:
@@ -292,7 +291,7 @@ This rule will timeout all the responses that take more than 1 second in the vot
 istioctl create -f manifests/timeout-vote.yaml
 ```
 
-In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests. 
+In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests.
 ```yaml
 apiVersion: config.istio.io/v1alpha2
 kind: RouteRule
@@ -300,7 +299,7 @@ metadata:
   name: cloudant-delay
   namespace: default
 spec:
-  destination: 
+  destination:
     name: cloudant-service
   httpFault:
     delay:
@@ -314,7 +313,7 @@ This rule will inject a fixed 1.1-second delay on all the requests going to Clou
 istioctl create -f manifests/fault-injection.yaml
 ```
 
-Now point your browser to:  `http://<IP:NodePort>` 
+Now point your browser to:  `http://<IP:NodePort>`
 
 Next, enable your **developer mode** on your browser and click on **network**. Then, click **Vote** on the microprofile site. Now you should able to see a 504 timeout error for the GET request on `http://<IP:NodePort>/vote/rate` since cloudant needs more than one second to response back to the vote service.
 
@@ -349,22 +348,5 @@ mvn clean package
 
 This Java MicroProfile codebase is based on WebSphere Liberty's [Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)
 
-# Privacy Notice
-
-Sample Kubernetes Yaml file that includes this package may be configured to track deployments to [IBM Cloud](https://www.bluemix.net/) and other Kubernetes platforms. The following information is sent to a [Deployment Tracker](https://github.com/IBM/metrics-collector-service) service on each deployment:
-
-* Kubernetes Cluster Provider(`IBM Cloud,Minikube,etc`)
-* Kubernetes Machine ID
-* Kubernetes Cluster ID (Only from IBM Cloud's cluster)
-* Kubernetes Customer ID (Only from IBM Cloud's cluster)
-* Environment variables in this Kubernetes Job.
-
-This data is collected from the Kubernetes Job in the sample application's yaml file. This data is used by IBM to track metrics around deployments of sample applications to IBM Cloud to measure the usefulness of our examples so that we can continuously improve the content we offer to you. Only deployments of sample applications that include code to ping the Deployment Tracker service will be tracked.
-
-## Disabling Deployment Tracking
-
-Please comment out/remove the Metric Kubernetes Job portion at the end of the 'manifests/deploy-cloudant.yaml' file.
-
 # License
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
-

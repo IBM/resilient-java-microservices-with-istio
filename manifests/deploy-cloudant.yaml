@@ -43,7 +43,7 @@ spec:
       name: http
   selector:
     name: cloudant-deployment
---- 
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -86,24 +86,3 @@ spec:
         - name: cloudant-pv
           persistentVolumeClaim:
             claimName: cloudant-pv-claim
----
-apiVersion: batch/v1
-kind: Job
-metadata: {name: resilient-java-microservices-with-istio-metrics}
-spec:
-  template:
-    metadata: {name: resilient-java-microservices-with-istio-metrics}
-    spec:
-      containers:
-        - env:
-            - {name: config, value: '{"event_id": "web",
-                "repository_id": "resilient-java-microservices-with-istio",
-                "target_services": [null], "target_runtimes":
-                ["Kubernetes Cluster"], "event_organizer":
-                "dev-journeys"}'}
-            - {name: language, value: 'java'}
-          image: journeycode/kubernetes:latest
-          name: resilient-java-microservices-with-istio-metrics
-          resources:
-            limits: {cpu: 100m}
-      restartPolicy: Never
