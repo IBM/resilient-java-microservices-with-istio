@@ -145,7 +145,9 @@ Before you proceed to the following steps, change the `journeycode` in your yaml
 
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar into an existing microservice configuration, do:
 ```shell
-kubectl apply -f manifests/deploy-job.yaml #Create a secret for cloudant credential
+#First we Create a secret for cloudant credential
+kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --from-literal=dbPassword=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;`
+
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
@@ -341,7 +343,6 @@ mvn clean package
 
 * Your microservice vote will use cloudantDB as the database, and it will initialize the database on your first POST request on the application. Therefore, when you vote on the speaker/session for your first time, please only vote once within the first 10 seconds to avoid causing a race condition on creating the new database.
 
-* Please avoid using Kubernetes 1.7.x on this example since version 1.7.x has a bug that will corrupt the cloudant database pods.
 
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)
