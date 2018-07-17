@@ -85,62 +85,62 @@ cd resilient-java-microservices-with-istio
 >그러면, [단계 2](#2-deploy-application-microservices-and-istio-envoys)로 진행 할 수 있습니다.
 
   아래 프로젝트들에 대해 각각 `git clone` 과 `mvn clean package` 를 실행하십시오:
-   * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
+   * [Web-App](https://github.com/WASdev/sample.microservices.web-app)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git
+      git clone https://github.com/WASdev/sample.microservices.web-app.git
   ```
-   * [Schedule](https://github.com/WASdev/sample.microservicebuilder.schedule)
+   * [Schedule](https://github.com/WASdev/sample.microservices.schedule)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.schedule.git
+      git clone https://github.com/WASdev/sample.microservices.schedule.git
   ```
-   * [Speaker](https://github.com/WASdev/sample.microservicebuilder.speaker)
+   * [Speaker](https://github.com/WASdev/sample.microservices.speaker)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.speaker.git
+      git clone https://github.com/WASdev/sample.microservices.speaker.git
   ```
-   * [Session](https://github.com/WASdev/sample.microservicebuilder.session)
+   * [Session](https://github.com/WASdev/sample.microservices.session)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.session.git
+      git clone https://github.com/WASdev/sample.microservices.session.git
   ```
-   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote) 
+   * [Vote](https://github.com/WASdev/sample.microservices.vote) 
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
+      git clone https://github.com/WASdev/sample.microservices.vote.git
   ```
-* 각각의 ../sample.microservicebuilder.* 프로젝트에서 `mvn clean package` 를 실행하십시오.
+* 각각의 ../sample.microservices.* 프로젝트에서 `mvn clean package` 를 실행하십시오.
 
 이제, 아래 명령들을 사용하여 마이크로 서비스 컨테이너를 빌드하십시오.
 
 web-app 마이크로 서비스 컨테이너 빌드하기
 
 ```shell
-docker build -t <docker_username>/microservice-webapp sample.microservicebuilder.web-app
+docker build -t <docker_username>/microservice-webapp sample.microservices.web-app
 docker push <docker_username>/microservice-webapp
 ```
 
 schedule 마이크로 서비스 컨테이너 빌드하기
 
 ```shell
-docker build -t <docker_username>/microservice-schedule sample.microservicebuilder.schedule
+docker build -t <docker_username>/microservice-schedule sample.microservices.schedule
 docker push <docker_username>/microservice-schedule
 ```
 
 speaker 마이크로 서비스 컨테이너 빌드하기
 
 ```shell
-docker build -t <docker_username>/microservice-speaker sample.microservicebuilder.speaker
+docker build -t <docker_username>/microservice-speaker sample.microservices.speaker
 docker push <docker_username>/microservice-speaker
 ```
 
 session 마이크로 서비스 컨테이너 빌드하기
 
 ```shell
-docker build -t <docker_username>/microservice-session sample.microservicebuilder.session
+docker build -t <docker_username>/microservice-session sample.microservices.session
 docker push <docker_username>/microservice-session
 ```
 
 vote 마이크로 서비스 컨테이너 빌드하기
 
 ```shell
-docker build -t <docker_username>/microservice-vote-cloudant sample.microservicebuilder.vote
+docker build -t <docker_username>/microservice-vote-cloudant sample.microservices.vote
 docker push <docker_username>/microservice-vote-cloudant
 ```
 
@@ -356,7 +356,7 @@ mvn clean package
 # 참조
 [Istio.io](https://istio.io/docs/tasks/index.html)
 
-Java MicroProfile 코드는 WebSphere Liberty의 [Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)을 기반으로 하고 있습니다.
+Java MicroProfile 코드는 WebSphere Liberty의 [Microprofile Showcase Application](https://github.com/WASdev/sample.microservices.docs)을 기반으로 하고 있습니다.
 
 # 라이센스
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)

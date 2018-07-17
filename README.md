@@ -76,62 +76,62 @@ Now, make sure you login to Docker first before you proceed to the following ste
 >Then, you can move on to [Step 2](#2-deploy-application-microservices-and-istio-envoys).
 
   `git clone` and `mvn clean package` the following projects:
-   * [Web-App](https://github.com/WASdev/sample.microservicebuilder.web-app)
+   * [Web-App](https://github.com/WASdev/sample.microservices.web-app)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git
+      git clone https://github.com/WASdev/sample.microservices.web-app.git
   ```
-   * [Schedule](https://github.com/WASdev/sample.microservicebuilder.schedule)
+   * [Schedule](https://github.com/WASdev/sample.microservices.schedule)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.schedule.git
+      git clone https://github.com/WASdev/sample.microservices.schedule.git
   ```
-   * [Speaker](https://github.com/WASdev/sample.microservicebuilder.speaker)
+   * [Speaker](https://github.com/WASdev/sample.microservices.speaker)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.speaker.git
+      git clone https://github.com/WASdev/sample.microservices.speaker.git
   ```
-   * [Session](https://github.com/WASdev/sample.microservicebuilder.session)
+   * [Session](https://github.com/WASdev/sample.microservices.session)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.session.git
+      git clone https://github.com/WASdev/sample.microservices.session.git
   ```
-   * [Vote](https://github.com/WASdev/sample.microservicebuilder.vote)
+   * [Vote](https://github.com/WASdev/sample.microservices.vote)
    ```shell
-      git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
+      git clone https://github.com/WASdev/sample.microservices.vote.git
   ```
-* `mvn clean package` in each ../sample.microservicebuilder.* projects
+* `mvn clean package` in each ../sample.microservices.* projects
 
 Now, use the following commands to build the microservice containers.
 
 Build the web-app microservice container
 
 ```shell
-docker build -t <docker_username>/microservice-webapp sample.microservicebuilder.web-app
+docker build -t <docker_username>/microservice-webapp sample.microservices.web-app
 docker push <docker_username>/microservice-webapp
 ```
 
 Build the schedule microservice container
 
 ```shell
-docker build -t <docker_username>/microservice-schedule sample.microservicebuilder.schedule
+docker build -t <docker_username>/microservice-schedule sample.microservices.schedule
 docker push <docker_username>/microservice-schedule
 ```
 
 Build the speaker microservice container
 
 ```shell
-docker build -t <docker_username>/microservice-speaker sample.microservicebuilder.speaker
+docker build -t <docker_username>/microservice-speaker sample.microservices.speaker
 docker push <docker_username>/microservice-speaker
 ```
 
 Build the session microservice container
 
 ```shell
-docker build -t <docker_username>/microservice-session sample.microservicebuilder.session
+docker build -t <docker_username>/microservice-session sample.microservices.session
 docker push <docker_username>/microservice-session
 ```
 
 Build the vote microservice container
 
 ```shell
-docker build -t <docker_username>/microservice-vote-cloudant sample.microservicebuilder.vote
+docker build -t <docker_username>/microservice-vote-cloudant sample.microservices.vote
 docker push <docker_username>/microservice-vote-cloudant
 ```
 
@@ -347,7 +347,7 @@ mvn clean package
 # References
 [Istio.io](https://istio.io/docs/tasks/index.html)
 
-This Java MicroProfile codebase is based on WebSphere Liberty's [Microprofile Showcase Application](https://github.com/WASdev/sample.microservicebuilder.docs)
+This Java MicroProfile codebase is based on WebSphere Liberty's [MicroProfile Showcase Application](https://github.com/WASdev/sample.microservices.docs)
 
 # License
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)

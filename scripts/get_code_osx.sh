@@ -10,29 +10,29 @@ if [ $# -ne 1 ]; then
     exit
 fi
 
-git clone https://github.com/WASdev/sample.microservicebuilder.web-app.git
-mvn_clean sample.microservicebuilder.web-app
-docker build -t $1/microservice-webapp sample.microservicebuilder.web-app
+git clone https://github.com/WASdev/sample.microservices.web-app.git
+mvn_clean sample.microservices.web-app
+docker build -t $1/microservice-webapp sample.microservices.web-app
 docker push $1/microservice-webapp
 
-git clone https://github.com/WASdev/sample.microservicebuilder.schedule.git
-mvn_clean sample.microservicebuilder.schedule
-docker build -t $1/microservice-schedule sample.microservicebuilder.schedule
+git clone https://github.com/WASdev/sample.microservices.schedule.git
+mvn_clean sample.microservices.schedule
+docker build -t $1/microservice-schedule sample.microservices.schedule
 docker push $1/microservice-schedule
 
-git clone https://github.com/WASdev/sample.microservicebuilder.speaker.git
-mvn_clean sample.microservicebuilder.speaker
-docker build -t $1/microservice-speaker sample.microservicebuilder.speaker
+git clone https://github.com/WASdev/sample.microservices.speaker.git
+mvn_clean sample.microservices.speaker
+docker build -t $1/microservice-speaker sample.microservices.speaker
 docker push $1/microservice-speaker
 
-git clone https://github.com/WASdev/sample.microservicebuilder.session.git
-mvn_clean sample.microservicebuilder.session
-docker build -t $1/microservice-session sample.microservicebuilder.session
+git clone https://github.com/WASdev/sample.microservices.session.git
+mvn_clean sample.microservices.session
+docker build -t $1/microservice-session sample.microservices.session
 docker push $1/microservice-session
 
-git clone https://github.com/WASdev/sample.microservicebuilder.vote.git
-mvn_clean sample.microservicebuilder.vote
-docker build -t $1/microservice-vote-cloudant sample.microservicebuilder.vote
+git clone https://github.com/WASdev/sample.microservices.vote.git
+mvn_clean sample.microservices.vote
+docker build -t $1/microservice-vote-cloudant sample.microservices.vote
 docker push $1/microservice-vote-cloudant
 
 sed -i '' s#"journeycode"#$1# manifests/deploy-schedule.yaml
