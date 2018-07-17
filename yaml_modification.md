@@ -8,9 +8,9 @@ For this Istio example, we modified the following yaml files in the MicroProfile
 - [*deploy-session.yaml*](images/session_diff.png)
 - [*deploy-vote.yaml*](images/vote_diff.png)
 
-Since the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes), we need to remove all the Microservice Builder dependencies (readinessProbe, livenessProbe, env, volumeMounts, and volumes) from the original yaml files in order to deploy the application without any infrastructure services and on Istio. 
+Since the original MicroProfile example is built on top of the Fabric (an extra infrastructure services on top of Kubernetes), we need to remove all the Fabric (readinessProbe, livenessProbe, env, volumeMounts, and volumes) from the original yaml files in order to deploy the application without any infrastructure services and on Istio. 
 
-In addition, we added some lables and changed the image names, so users can use their own images and manage all the deployments using the app tag. We also added the target port so the service discovery can do less work and deploy the application much faster. 
+In addition, we added some labels and changed the image names, so users can use their own images and manage all the deployments using the app tag. We also added the target port so the service discovery can do less work and deploy the application much faster. 
 
 Moreover, within the original *deploy-vote.yaml*, there are secret creation job, cloudant deployment, and vote deployment. The secret creation job doesn't need to have an Envoy sidecar, and the cloudant database needs to access some external network. Thus, we break down the *deploy-vote.yaml* in the vote microservice to *deploy-job.yaml*, *deploy-cloudant.yaml*, and *deploy-vote.yaml* in order to inject the Envoy sidecars differently. 
 
