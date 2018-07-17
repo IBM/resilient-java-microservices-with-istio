@@ -30,12 +30,8 @@ spec:
             secretKeyRef:
               name: cloudant-secret
               key: dbPassword 
-        - name: dbHost
-          value: $CLOUDANT_SERVICE_SERVICE_HOST
-        - name: dbPort
-          value: $CLOUDANT_SERVICE_SERVICE_PORT
-        command: ["/bin/sh","-c"]
-        args: ["if [ ! -z $dbPassword ]; then export dbUrl=http://$CLOUDANT_SERVICE_SERVICE_HOST:$CLOUDANT_SERVICE_SERVICE_PORT; exec /opt/ibm/wlp/bin/server run defaultServer; fi;"]
+        - name: dbUrl
+          value: http://cloudant-service:80
         ports:
           - containerPort: 9080
 
