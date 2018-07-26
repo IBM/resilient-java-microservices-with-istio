@@ -26,8 +26,8 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio (0.2.12+)](https://istio.io/)
-- [Kubernetes Clusters (1.8.0+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
+- [Istio (0.8)](https://istio.io/)
+- [Kubernetes Clusters (1.9+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 - [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
@@ -151,12 +151,12 @@ kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-speaker.yaml)
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-cloudant.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-vote.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-webapp.yaml)
 ```
 
-After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote-v1, vote-v2, cloudant, and webapp**.
+After a few minutes, you should now have your Kubernetes Pods running and have an Envoy sidecar in each of them alongside the microservice. The microservices are **schedule, session, speaker, vote, cloudant, and webapp**.
 ```shell
 $ kubectl get pods
 NAME                                           READY     STATUS      RESTARTS   AGE
@@ -165,22 +165,22 @@ microservice-schedule-sample-971365647-74648   2/2       Running     0          
 microservice-session-sample-2341329899-2bjhg   2/2       Running     0          2d
 microservice-speaker-sample-1294850951-w76b5   2/2       Running     0          2d
 microservice-vote-sample-3728755778-5c4vx      2/2       Running     0          1h
-microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d   
+microservice-webapp-sample-3875068375-bvp87    2/2       Running     0          2d
 ```
 
-To access your application, you want to create an ingress to connect all the microservices and access it via istio ingress. Thus, do:
+To access your application, you need to create an Istio Gateway to connect all the microservices and access it. Thus, do:
 
 ```shell
-kubectl create -f manifests/ingress.yaml
+istioctl create -f manifests/istio-gateway.yaml
 ```
 
 You can check the public IP address of your IBM Cloud cluster through `bx cs workers <your_cluster_name>` and get the NodePort of the istio-ingress service for port 80 through `kubectl get svc -n istio-system | grep istio-ingress`. Or you can also run the following command to output the IP address and NodePort:
 ```bash
-echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingress -n istio-system -o jsonpath={.spec.ports[0].nodePort})
+echo $(bx cs workers <your_cluster_name> | grep normal | awk '{ print $2 }' | head -1):$(kubectl get svc istio-ingressgateway -n istio-system -o jsonpath='{.spec.ports[0].nodePort}')
 # Replace <your_cluster_name> with your cluster name. This should output your IP:NodePort e.g. 184.172.247.2:30344
 ```
 
-Point your browser to:  
+Point your browser to:
 `http://<IP:NodePort>` Replace `<IP:NodePort>` with your own IP and NodePort.
 
 Congratulations, you MicroProfile application is running and it should look like [this](microprofile_ui.md).
@@ -195,27 +195,32 @@ Now we will show you how to enable circuit breaker for the sample Java microserv
 
 Before we move on, we need to understand these different types of Circuit Breaker:
 - Maximum Connections: Maximum number of connections to a backend. Any excess connection will be pending in a queue. You can modify this number by changing the `maxConnections` field.
-- Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `httpMaxPendingRequests` field.
+- Maximum Pending Requests: Maximum number of pending requests to a backend. Any excess pending requests will be denied. You can modify this number by changing the `http1MaxPendingRequests` field.
 
-Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that trigger a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/reference/config/traffic-rules/destination-policies.html#simplecircuitbreakerpolicy) to check out more details for each field.
+Now take a look at the **circuit-breaker-db.yaml** file in manifests. We set Cloudant's maximum connections to 1 and Maximum pending requests to 1. Thus, if we sent more than 2 requests at once to cloudant, cloudant will have 1 pending request and deny any additional requests until the pending request is processed. Furthermore, it will detect any host that triggers a server error (5XX code) in the Cloudant's Envoy and eject the pod out of the load balancing pool for 15 minutes. You can visit [here](https://istio.io/docs/tasks/traffic-management/circuit-breaking/) to check out more details for each field.
 
 ```yaml
-apiVersion: config.istio.io/v1alpha2
-kind: DestinationPolicy
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
 metadata:
   name: db-circuit
   namespace: default
 spec:
-  destination:
-    name: cloudant-service
-  circuitBreaker:
-    simpleCb:
-      maxConnections: 1
-      httpMaxPendingRequests: 1
-      httpConsecutiveErrors: 1
-      sleepWindow: 15m                # Required field
-      httpDetectionInterval: 1s       # Required field
-      httpMaxEjectionPercent: 100  
+  host: cloudant-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      http:
+        consecutiveErrors: 1
+        interval: 1s
+        baseEjectionTime: 15m
+        maxEjectionPercent: 100
+
 ```
 
 ![circuit breaker](images/circuit_breaker.png)
@@ -238,10 +243,19 @@ Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode
 A load balancing pool is a set of instances that are under the same Kubernetes service, and envoy distributes the traffic across those instances. If some of those instances are broken, the circuit breaker can eject any broken pod in your load balancing pool to avoid any further failure. To demonstrate this, create a new cloudant database instance, cloudant-db pod 2, that listens to the wrong host.
 
 ```shell
-kubectl apply -f <(istioctl kube-inject -f manifests/deploy-broken-cloudant.yaml --includeIPRanges=172.30.0.0/16,172.20.0.0/16)
+kubectl apply -f <(istioctl kube-inject -f manifests/deploy-broken-cloudant.yaml)
 ```
 
-To better test the load balancing pool ejection, you don't want the circuit breaker to eject requests for maximum connection and pending requests. Hence, remove `maxConnections: 1` and `httpMaxPendingRequests: 1` inside **manifests/circuit-breaker-db.yaml** and run
+To better test the load balancing pool ejection, you don't want the circuit breaker to eject requests for maximum connection and pending requests. Hence, remove or comment out this block:
+```
+connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        maxRequestsPerConnection: 1
+```
+inside **manifests/circuit-breaker-db.yaml** and run
 
 ```shell
 istioctl replace -f manifests/circuit-breaker-db.yaml
