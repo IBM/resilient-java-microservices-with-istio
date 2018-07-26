@@ -1,16 +1,20 @@
-apiVersion: config.istio.io/v1alpha2
-kind: DestinationPolicy
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
 metadata:
   name: db-circuit
   namespace: default
 spec:
-  destination: 
-    name: cloudant-service
-  circuitBreaker:
-    simpleCb:
-      maxConnections: 1
-      httpMaxPendingRequests: 1
-      httpConsecutiveErrors: 1
-      sleepWindow: 15m
-      httpDetectionInterval: 1s
-      httpMaxEjectionPercent: 100
+  host: cloudant-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      http:
+        consecutiveErrors: 1
+        interval: 1s
+        baseEjectionTime: 15m
+        maxEjectionPercent: 100
