@@ -1,5 +1,5 @@
 #!/bin/bash
-kubectl create -f manifests/ingress.yaml
+kubectl create -f manifests/istio-gateway.yaml
 kubectl apply -f manifests/deploy-job.yaml
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)

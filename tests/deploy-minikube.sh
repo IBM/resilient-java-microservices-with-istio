@@ -1,21 +1,14 @@
 #!/bin/bash -e
 
 # shellcheck disable=SC1090
-source "$(dirname "$0")"/../scripts/resources.sh
-
-setup_dind-cluster() {
-    wget https://cdn.rawgit.com/Mirantis/kubeadm-dind-cluster/master/fixed/dind-cluster-v1.8.sh
-    chmod 0755 dind-cluster-v1.8.sh
-    ./dind-cluster-v1.8.sh up
-    export PATH="$HOME/.kubeadm-dind-cluster:$PATH"
-}
+source "$(dirname "$0")"/../pattern-ci/scripts/resources.sh
 
 kubectl_deploy() {
     echo "install Istio"
     curl -L https://git.io/getIstio | sh -
     cd $(ls | grep istio)
     export PATH="$PATH:$(pwd)/bin"
-    kubectl apply -f install/kubernetes/istio.yaml
+    kubectl apply -f install/kubernetes/istio-demo.yaml
 
     echo "Running scripts/quickstart.sh"
     cd /home/travis/build/IBM/resilient-java-microservices-with-istio
@@ -43,9 +36,7 @@ verify_deploy(){
 }
 
 main(){
-    if ! setup_dind-cluster; then
-        test_failed "$0"
-    elif ! kubectl_deploy; then
+    if ! kubectl_deploy; then
         test_failed "$0"
     elif ! verify_deploy; then
         test_failed "$0"
