@@ -329,7 +329,7 @@ spec:
             host: cloudant-service.default.svc.cluster.local
 ```
 
-This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Furthermore, you can uncomment the abort section to inject some abort errors. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
+This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
 
 ```shell
 istioctl create -f manifests/fault-injection.yaml
