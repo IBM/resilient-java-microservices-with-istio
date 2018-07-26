@@ -1,12 +1,16 @@
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: cloudant-delay
-  namespace: default
+  name: fault-injection
 spec:
-  destination: 
-    name: cloudant-service
-  httpFault:
-    delay:
-      percent: 100
-      fixedDelay: 1.1s
+  hosts:
+    - cloudant-service.default.svc.cluster.local
+  http:
+    - fault:
+        delay:
+          percent: 100
+          fixedDelay: 1.1s
+      route:
+        - destination:
+            host: cloudant-service.default.svc.cluster.local

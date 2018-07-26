@@ -1,12 +1,13 @@
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
   name: timeout
-  namespace: default
 spec:
-  destination: 
-    name: vote-service
-  httpReqTimeout:
-    simpleTimeout:
-      timeout: 1s
-      
+  hosts:
+    - vote-service.default.svc.cluster.local
+  http:
+    - timeout: 1s
+      route:
+        - destination:
+            host: vote-service.default.svc.cluster.local

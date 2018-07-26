@@ -282,26 +282,28 @@ istioctl delete -f manifests/circuit-breaker-db.yaml
 
 Here's an example to demonstrate how can you add resiliency via timeouts in your application. First, we want to create a 1-second timeout to the vote service, so the vote service can stop listening if cloudant is not responding within 1-second.
 
-Then, in order to make sure we can trigger and test this, we will inject more than 1-second delay to cloudant, so the vote service will be timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing fault injection.
+Then, in order to make sure we can trigger and test this, we will inject a more than 1-second delay to cloudant, so the vote service will timeout for each response from cloudant. This process is called Fault Injection, where essentially we are introducing faults to our paths for testing and improve error handling.
 
 ![fault tolerance](images/fault_tolerance.png)
 
 Now take a look at the **timeout-vote** file in manifests.
 ```yaml
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
   name: timeout
-  namespace: default
 spec:
-  destination:
-    name: vote-service
-  httpReqTimeout:
-    simpleTimeout:
-      timeout: 1s
+  hosts:
+    - vote-service.default.svc.cluster.local
+  http:
+    - timeout: 1s
+      route:
+        - destination:
+            host: vote-service.default.svc.cluster.local
 ```
 
-This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout. You also can apply retries rule by uncommenting the `httpReqRetries` section and delete/commenting out the `httpReqTimeout` section. Now, let's apply a 1-second timeout on your Vote service.
+This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout.
 
 ```shell
 istioctl create -f manifests/timeout-vote.yaml
@@ -309,18 +311,22 @@ istioctl create -f manifests/timeout-vote.yaml
 
 In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests.
 ```yaml
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: cloudant-delay
-  namespace: default
+  name: fault-injection
 spec:
-  destination:
-    name: cloudant-service
-  httpFault:
-    delay:
-      percent: 100
-      fixedDelay: 1.1s
+  hosts:
+    - cloudant-service.default.svc.cluster.local
+  http:
+    - fault:
+        delay:
+          percent: 100
+          fixedDelay: 1.1s
+      route:
+        - destination:
+            host: cloudant-service.default.svc.cluster.local
 ```
 
 This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Furthermore, you can uncomment the abort section to inject some abort errors. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
