@@ -26,7 +26,7 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 ## Included Components
 - [MicroProfile](https://microprofile.io)
-- [Istio (0.8)](https://istio.io/)
+- [Istio (1.0)](https://istio.io/)
 - [Kubernetes Clusters (1.9+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
@@ -286,27 +286,31 @@ Then, in order to make sure we can trigger and test this, we will inject a more 
 
 ![fault tolerance](images/fault_tolerance.png)
 
-Now take a look at the **timeout-vote** file in manifests.
+Now take a look at the **istio-gateway-vote-timeout** file in manifests.
 ```yaml
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: timeout
+  name: microservice-main-routes
 spec:
-  hosts:
-    - vote-service.default.svc.cluster.local
+  ...
   http:
-    - timeout: 1s
+    - match:
+          - uri:
+              prefix: /vote
       route:
         - destination:
-            host: vote-service.default.svc.cluster.local
+            host: vote-service
+            port:
+              number: 9080
+      timeout: 1s ## Additional configuration
+  ...
 ```
-
-This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout.
+We are adding `timeout` in our main route to vote-service. This rule will timeout all the responses that take more than 1 second in the vote service. You can modify `timeout` to add more time for your timeout. Then do:
 
 ```shell
-istioctl create -f manifests/timeout-vote.yaml
+istioctl replace -f manifests/istio-gateway-vote-timeout.yaml
 ```
 
 In order to test our timeout rule is working properly, we need to apply some fault injections. Thus, take a look at the **fault-injection.yaml** in manifests.
@@ -315,10 +319,10 @@ In order to test our timeout rule is working properly, we need to apply some fau
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: fault-injection
+  name: cloudant-service
 spec:
   hosts:
-    - cloudant-service.default.svc.cluster.local
+    - cloudant-service
   http:
     - fault:
         delay:
@@ -326,7 +330,7 @@ spec:
           fixedDelay: 1.1s
       route:
         - destination:
-            host: cloudant-service.default.svc.cluster.local
+            host: cloudant-service
 ```
 
 This rule will inject a fixed 1.1-second delay on all the requests going to Cloudant. You can modify `percent` and `fixedDelay` to change the probability and the amount of time for delay. Now let's apply a 1.1-second delay on the cloudant service to trigger your Vote service timeout.
@@ -342,8 +346,8 @@ Next, enable your **developer mode** on your browser and click on **network**. T
 # Troubleshooting
 * To delete Istio from your cluster, run the following commands in your istio directory
 ```shell
-kubectl delete -f install/kubernetes/istio-rbac-alpha.yaml # or istio-rbac-beta.yaml
-kubectl delete -f install/kubernetes/istio.yaml
+kubectl delete -f install/kubernetes/istio-demo.yaml
+kubectl delete -f install/kubernetes/istio-demo-auth.yaml # If you installed Istio with this yaml file
 ```
 * To delete your microprofile application, run the following commands in this Github repo's main directory
 ```shell

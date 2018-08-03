@@ -43,6 +43,7 @@ spec:
       name: http
   selector:
     name: cloudant-deployment
+    app: cloudant-deployment
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -56,6 +57,7 @@ spec:
     metadata:
       labels:
         name: cloudant-deployment
+        app: cloudant-deployment
         version: v1
     spec:
       containers:

@@ -2,10 +2,10 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: fault-injection
+  name: cloudant-service
 spec:
   hosts:
-    - cloudant-service.default.svc.cluster.local
+    - cloudant-service
   http:
     - fault:
         delay:
@@ -13,4 +13,4 @@ spec:
           fixedDelay: 1.1s
       route:
         - destination:
-            host: cloudant-service.default.svc.cluster.local
+            host: cloudant-service
