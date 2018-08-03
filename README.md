@@ -146,7 +146,7 @@ Before you proceed to the following steps, change the `journeycode` in your yaml
 Envoys are deployed as sidecars on each microservice. Injecting Envoy into your microservice means that the Envoy sidecar would manage the ingoing and outgoing calls for the service. To inject an Envoy sidecar into an existing microservice configuration, do:
 ```shell
 #First we Create a secret for cloudant credential
-kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --from-literal=dbPassword=`< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;`
+kubectl create secret generic cloudant-secret --from-literal=dbUsername=admin --from-literal=dbPassword=$(LC_CTYPE=C < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
 
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-schedule.yaml)
 kubectl apply -f <(istioctl kube-inject -f manifests/deploy-session.yaml)
@@ -215,11 +215,10 @@ spec:
         http1MaxPendingRequests: 1
         maxRequestsPerConnection: 1
     outlierDetection:
-      http:
-        consecutiveErrors: 1
-        interval: 1s
-        baseEjectionTime: 15m
-        maxEjectionPercent: 100
+      consecutiveErrors: 1
+      interval: 1s
+      baseEjectionTime: 15m
+      maxEjectionPercent: 100
 
 ```
 
