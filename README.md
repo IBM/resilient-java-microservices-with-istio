@@ -29,11 +29,11 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 - [Istio (1.0)](https://istio.io/)
 - [Kubernetes Clusters (1.9+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
-- [Bluemix DevOps Toolchain Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
+- [IBM Cloud Continuous Delivery Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
 - [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
 
 # Prerequisite
-- Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, with [IBM Cloud Private](https://github.com/IBM/deploy-ibm-cloud-private/blob/master/README.md), or with [IBM Bluemix Container Service](https://console.bluemix.net/docs/containers/container_index.html#clusters) to deploy in cloud. The code here is regularly tested against [Kubernetes Cluster from Bluemix Container Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
+- Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, with [IBM Cloud Private](https://github.com/IBM/deploy-ibm-cloud-private/blob/master/README.md), or with [IBM Cloud Kubernetes Service](https://console.bluemix.net/docs/containers/container_index.html#clusters) to deploy in cloud. The code here is regularly tested against [Kubernetes Cluster from IBM Cloud Kubernetes Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
 - You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio Quick Start](https://istio.io/docs/setup/kubernetes/quick-start.html), to get Istio mesh installed on Kubernetes.
 
 # Steps
