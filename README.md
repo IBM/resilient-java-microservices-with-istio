@@ -231,7 +231,23 @@ Create a circuit breaker policy on your cloudant service.
 istioctl create -f manifests/circuit-breaker-db.yaml
 ```
 
-Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode** on your browser, and click on **network**. Go to Speaker or Session and try to vote 5 times within a second. Then, you should see the last 2 to 3 vote will return a server error because there are more than one pending request get sent to cloudant. Therefore, the circuit breaker will eject the rest of the requests.
+Now point your browser to:  `http://<IP:NodePort>`, enable your **developer mode** on your browser, and click on **network**. Go to Speaker or Session and try to vote 5 times within a second. Then, you should see the last 2 to 3 vote will return a server error because there are more than one pending request get sent to cloudant. Therefore, the circuit breaker will reject the rest of the requests.
+
+When viewing the logs of the vote microservice pod, you would see these errors from the Liberty runtime when the limit being enforced by Istio has been reached and
+calls to the database start to fail:
+
+```shell
+[WARNING ] Application {http://api.vote.showcase.microprofile.io/}SessionVote has thrown exception, unwinding now
+Unable to execute request: 503 : upstream connect error or disconnect/reset before headers
+[WARNING ] Exception in handleFault on interceptor org.apache.cxf.jaxrs.interceptor.JAXRSDefaultFaultOutInterceptor@8527bddd
+Unable to execute request: 503 : upstream connect error or disconnect/reset before headers
+[ERROR   ] Error occurred during error handling, give up!
+Unable to execute request: 503 : upstream connect error or disconnect/reset before headers
+[ERROR   ] SRVE0777E: Exception thrown by application class 'io.microprofile.showcase.vote.persistence.couch.CouchConnection.request:179'
+io.microprofile.showcase.vote.persistence.couch.RequestStatusException: Unable to execute request: 503 : upstream connect error or disconnect/reset before headers
+        at io.microprofile.showcase.vote.persistence.couch.CouchConnection.request(CouchConnection.java:179)
+        at io.microprofile.showcase.vote.persistence.couch.CouchConnection.request(CouchConnection.java:123)
+```
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
