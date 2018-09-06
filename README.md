@@ -224,6 +224,12 @@ spec:
 
 ![circuit breaker](images/circuit_breaker.png)
 
+The following Grafana dashboard animation shows votes being clicked prior to the circuit breaker rule being applied. 
+
+> Note: Grafana can be set up by following the instructions in this related code pattern: [Manage microservices traffic using Istio](https://developer.ibm.com/patterns/manage-microservices-traffic-using-istio/).
+
+
+![grafana dashboard](gifs/grafana1.gif)
 
 Create a circuit breaker policy on your cloudant service.
 
@@ -248,6 +254,10 @@ io.microprofile.showcase.vote.persistence.couch.RequestStatusException: Unable t
         at io.microprofile.showcase.vote.persistence.couch.CouchConnection.request(CouchConnection.java:179)
         at io.microprofile.showcase.vote.persistence.couch.CouchConnection.request(CouchConnection.java:123)
 ```
+
+The animation below shows what you would see with votes being sent quickly enough to trip the circuit breaker rule:
+
+![grafana dashboard with failures](gifs/grafana2.gif)
 
 > Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
 
