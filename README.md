@@ -18,7 +18,7 @@ We then show how to configure and use circuit breakers, health checks and timeou
  - Control connection pool size and request load
  - Systematic fault injection
 
-We use the sample MicroProfile web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on WebSphere Liberty, in Docker containers managed by Kubernetes.
+We use the sample MicroProfile web application for managing a conference and it is based on a number of discrete microservices. The front end is written in Angular; the backing microservices are in Java. All run on Open Liberty, in Docker containers managed by Kubernetes.
 
 MicroProfile Fault Tolerance, adding application-specific capabilities such as failback functions that can work in conjunction with, or independently from, Istio capabilities will be the subject of a future update.
 
