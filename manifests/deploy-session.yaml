@@ -16,10 +16,10 @@ spec:
       containers:
       - name: microservice-session
         #change the image name
-        image: journeycode/microservice-session
+        image: journeycode/microservice-ol-session
         ports:
           - containerPort: 9080
-
+        imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1
 kind: Service

@@ -16,9 +16,10 @@ spec:
       containers:
       - name: microservice-speaker
         #change the image name
-        image: journeycode/microservice-speaker
+        image: journeycode/microservice-ol-speaker
         ports:
           - containerPort: 9080
+        imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1
 kind: Service
