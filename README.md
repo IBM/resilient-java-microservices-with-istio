@@ -6,7 +6,7 @@
 
 Building and packaging Java microservice is one part of the story. How do we make them resilient? How do we introduce health checks, timeouts, retries, ensure request buffering or reliable communication between microservices? Some of these features are coming built in microservices framework, but often they are language specific, or you have to accommodate for it in your application code. How do we introduce it without changing the application code? Service-mesh architecture attempts to solve these issues. [Istio](https://istio.io) provides an easy way to create this service mesh by deploying a [control plane](https://istio.io/docs/concepts/what-is-istio/overview.html#architecture) and injecting sidecars containers alongside your microservice.
 
-In this code we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and packaging Java microservices in a standardized way.
+In this pattern we demonstrate how to build and deploy your Java [MicroProfile](http://microprofile.io) microservices leveraging Istio service mesh. MicroProfile is a baseline Java platform for a microservices architecture and delivers application portability across multiple MicroProfile runtimes - the initial baseline is JAX-RS plus CDI plus JSON-P. It provides specs for building and packaging Java microservices in a standardized way.
 
 We then show how to configure and use circuit breakers, health checks and timeouts/retries resiliency features for the application.
 
@@ -30,11 +30,10 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 - [Kubernetes Clusters (1.9+)](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov)
 - [Cloudant](https://www.ibm.com/analytics/us/en/technology/cloud-data-services/cloudant/)
 - [IBM Cloud Continuous Delivery Service](https://console.ng.bluemix.net/catalog/services/continuous-delivery)
-- [WebSphere](https://developer.ibm.com/wasdev/websphere-liberty)
 
 # Prerequisite
 - Create a Kubernetes cluster with either [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube) for local testing, with [IBM Cloud Private](https://github.com/IBM/deploy-ibm-cloud-private/blob/master/README.md), or with [IBM Cloud Kubernetes Service](https://console.bluemix.net/docs/containers/container_index.html#clusters) to deploy in cloud. The code here is regularly tested against [Kubernetes Cluster from IBM Cloud Kubernetes Service](https://console.ng.bluemix.net/docs/containers/cs_ov.html#cs_ov) using Travis.
-- You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio Quick Start](https://istio.io/docs/setup/kubernetes/quick-start.html), to get Istio mesh installed on Kubernetes.
+- You will also need Istio service mesh installed on top of your Kubernetes cluster. Please follow the instructions, [Istio Quick Start](https://istio.io/docs/setup/kubernetes/quick-start.html), to get Istio mesh installed on Kubernetes. For the purposes of this pattern, you can follow the instructions in "Option 1" in the Quick Start documentation.
 
 # Steps
 
@@ -76,25 +75,25 @@ Now, make sure you login to Docker first before you proceed to the following ste
 >Then, you can move on to [Step 2](#2-deploy-application-microservices-and-istio-envoys).
 
   `git clone` and `mvn clean package` the following projects:
-   * [Web-App](https://github.com/WASdev/sample.microservices.web-app)
+   * [Web-App](https://github.com/IBM/sample.microservices.web-app)
    ```shell
-      git clone https://github.com/WASdev/sample.microservices.web-app.git
+      git clone https://github.com/IBM/sample.microservices.web-app.git
   ```
-   * [Schedule](https://github.com/WASdev/sample.microservices.schedule)
+   * [Schedule](https://github.com/IBM/sample.microservices.schedule)
    ```shell
-      git clone https://github.com/WASdev/sample.microservices.schedule.git
+      git clone https://github.com/IBM/sample.microservices.schedule.git
   ```
-   * [Speaker](https://github.com/WASdev/sample.microservices.speaker)
+   * [Speaker](https://github.com/IBM/sample.microservices.speaker)
    ```shell
-      git clone https://github.com/WASdev/sample.microservices.speaker.git
+      git clone https://github.com/IBM/sample.microservices.speaker.git
   ```
-   * [Session](https://github.com/WASdev/sample.microservices.session)
+   * [Session](https://github.com/IBM/sample.microservices.session)
    ```shell
-      git clone https://github.com/WASdev/sample.microservices.session.git
+      git clone https://github.com/IBM/sample.microservices.session.git
   ```
-   * [Vote](https://github.com/WASdev/sample.microservices.vote)
+   * [Vote](https://github.com/IBM/sample.microservices.vote)
    ```shell
-      git clone https://github.com/WASdev/sample.microservices.vote.git
+      git clone https://github.com/IBM/sample.microservices.vote.git
   ```
 * `mvn clean package` in each ../sample.microservices.* projects
 

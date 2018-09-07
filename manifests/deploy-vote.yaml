@@ -17,8 +17,8 @@ spec:
       containers:
       - name: microservice-vote
         #change this image name
-        image: journeycode/microservice-vote-cloudant
-        imagePullPolicy: Always
+        image: journeycode/microservice-ol-vote
+        imagePullPolicy: IfNotPresent
         env:
         - name: dbUsername
           valueFrom:
