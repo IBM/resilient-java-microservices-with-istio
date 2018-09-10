@@ -258,7 +258,7 @@ The animation below shows what you would see with votes being sent quickly enoug
 
 ![grafana dashboard with failures](gifs/grafana2.gif)
 
-> Note: using fault injection or mixer rule won't able to trigger the circuit breaker because all the traffic will be aborted/delayed before it get sent to the cloudant's Envoy.
+> Note: using fault injection or a mixer rule will not be able to trigger the circuit breaker because all the traffic will be aborted/delayed before it is sent to the cloudant's Envoy.
 
 ## 4. Circuit Breakers - Load balancing pool ejection
 
