@@ -56,6 +56,8 @@ MicroProfile Fault Tolerance, adding application-specific capabilities such as f
 
 > If you don't want to build your own images, you can use our default images and move on to [Step 2](#2-deploy-application-microservices-and-istio-envoys).
 
+Note that if you would like to experiment with new features available in the latest releases of Open Liberty, consider rebuilding the microservices images yourself first.
+
 Before you proceed to the following instructions, make sure you have [Maven](https://maven.apache.org/install.html) and [Docker](https://www.docker.com/community-edition#/download) installed on your machine.
 
 First, clone and get in our repository to obtain the necessary yaml files and scripts for downloading and building your applications and microservices.
